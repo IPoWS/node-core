@@ -14,20 +14,19 @@ type WSNode struct {
 }
 
 var (
-	connmap = make(map[uint32]*WSNode)
 	myhello hello.Hello
 )
 
 // listenHello 监听其他节点的 hello
 func listenHello(conn *websocket.Conn) {
 	mt, p, err := conn.ReadMessage()
+	t := time.Now().UnixNano()
 	if err == nil {
 		var h hello.Hello
 		err = h.Unmarshal(p)
-		if err == nil {
-			connmap[h.Wsnetaddr] = new(WSNode)
-			connmap[h.Wsnetaddr].conn = conn
-			connmap[h.Wsnetaddr].mt = mt
+		delay := t - h.Time
+		if err == nil && delay > 0 {
+			saveMap(&h, conn, mt, delay)
 			h = myhello
 			h.Time = time.Now().UnixNano()
 			err = sendHello(conn, mt, &h)

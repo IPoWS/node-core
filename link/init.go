@@ -21,12 +21,14 @@ func SetNPSUrl(url string) {
 // InitLink 初始化连接 返回 conn, messageType, delay, error
 func InitLink(url string) (conn *websocket.Conn, mt int, delay int64, err error) {
 	log.Printf("[initlink] connecting to %s", url)
-	t := time.Now().UnixNano()
 	conn, _, err = websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		log.Errorf("[initlink] %v", err)
 		return
 	}
+	t := time.Now().UnixNano()
+	myhello.Time = t
+	sendHello(conn, 0, &myhello)
 	mt, p, err := conn.ReadMessage()
 	if err != nil {
 		log.Errorf("[initlink] %v", err)
@@ -43,6 +45,7 @@ func InitLink(url string) (conn *websocket.Conn, mt int, delay int64, err error)
 		log.Errorf("[initlink] tr: %v, t: %v", hello.Time, t)
 		return
 	}
+	saveMap(&hello, conn, mt, delay)
 	log.Printf("[initlink] %s 链接测试成功，延时%vns", url, delay)
 	return
 }
