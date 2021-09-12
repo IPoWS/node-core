@@ -39,7 +39,7 @@ func (m *Nodes) Load() error {
 		Memmu.Unlock()
 	} else if os.IsNotExist(err) {
 		Memmu.Lock()
-		m.Nodes = make(map[string]*Node)
+		m.Nodes = make(map[string]string)
 		Memmu.Unlock()
 		err = nil
 	}

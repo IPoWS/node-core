@@ -5,12 +5,15 @@ import (
 	"time"
 
 	"github.com/IPoWS/node-core/data/hello"
+	"github.com/IPoWS/node-core/ip64"
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 )
 
 var (
 	npsurl string
+	mywsip uint64
+	mymask uint32
 )
 
 // SetNPSUrl 设置NPS服务器地址
@@ -27,26 +30,32 @@ func InitLink(url string) (conn *websocket.Conn, mt int, delay int64, err error)
 		return
 	}
 	t := time.Now().UnixNano()
-	myhello.Time = t
-	sendHello(conn, 0, &myhello)
+	h := myhello
+	h.Time = t
+	sendHelloUnknown(conn, mt, &h)
 	mt, p, err := conn.ReadMessage()
 	if err != nil {
 		log.Errorf("[initlink] %v", err)
 		return
 	}
-	var hello hello.Hello
-	err = hello.Unmarshal(p)
+	var ip ip64.Ip64
+	err = ip.Unmarshal(p)
+	if err != nil {
+		log.Errorf("[initlink] parse ip63 err: %v", err)
+		return
+	}
+	err = h.Unmarshal(ip.Data)
 	if err != nil {
 		log.Errorf("[initlink] parse hello err: %v", err)
 		return
 	}
-	delay = hello.Time - t
+	delay = h.Time - t
 	if delay <= 0 {
-		log.Errorf("[initlink] tr: %v, t: %v", hello.Time, t)
+		log.Errorf("[initlink] tr: %v, t: %v", h.Time, t)
 		return
 	}
-	saveMap(&hello, conn, mt, delay)
-	log.Printf("[initlink] %s 链接测试成功，延时%vns", url, delay)
+	saveMap(ip.From, conn, mt, delay)
+	log.Printf("[initlink] %s 链接测试成功，延时%vns，对方ip: %x", url, delay, ip.From)
 	return
 }
 
@@ -59,7 +68,7 @@ func InitEntry(ent string) {
 	http.HandleFunc("/"+ent, func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err == nil {
-			go listenHello(conn)
+			go listen(conn)
 		}
 	})
 }

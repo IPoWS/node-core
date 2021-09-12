@@ -6,6 +6,4 @@ message hello {
     int64 time = 1;
     // ws path
     string entry = 2;
-    // ip on ws using ipv6 addr fc00::add2::9a17::2333::host::addr::subn::addr and subnet mask of 64 bit fake ip addr is always /32
-    uint32 wsnetaddr = 3;
 }

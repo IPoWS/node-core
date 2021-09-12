@@ -1,18 +1,7 @@
 syntax = "proto3";
 package nodes;
 
-message Node {
-    // real ip
-    uint32 ip = 1;
-    // real port
-    uint32 port = 2;
-    // ws path
-    string entry = 3;
-    // ip on ws using ipv6 addr fc00::add2::9a17::2333::host::addr::subn::addr and subnet mask of 64 bit fake ip addr is always /32
-    uint32 wsnetaddr = 4;
-}
-
 message Nodes {
-    // real ip:port to node
-    map<string, Node> nodes = 1;
+    // real ip:port to entry
+    map<string, string> nodes = 1;
 }

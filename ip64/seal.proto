@@ -1,0 +1,13 @@
+syntax = "proto3";
+package ip64;
+
+message ip64 {
+    uint32 prototype = 1;
+    // ip on ws using ipv6 addr fc00::add2::9a17::2333::host::addr::subn::addr
+    uint64 from = 2;
+    uint64 to = 3;
+    // from+to ports
+    uint32 ports = 4;
+    uint32 datlen = 5;
+    bytes data = 6;
+}

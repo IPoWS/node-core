@@ -13,3 +13,9 @@ func Str2bytes(s string) []byte {
 func Bytes2str(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
+
+// Interface2Bytes Convert any ptr to []byte, you should use it only for reading
+func Interface2Bytes(ptr interface{}, length uintptr) []byte {
+	field := [2]uintptr{uintptr(unsafe.Pointer(&ptr)), length}
+	return *(*[]byte)(unsafe.Pointer(&field))
+}
