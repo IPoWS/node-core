@@ -1,13 +1,22 @@
 package link
 
 import (
-	"strconv"
+	"net/http"
 	"time"
 
-	"github.com/IPoWS/node-core/data"
+	"github.com/IPoWS/node-core/data/hello"
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 )
+
+var (
+	npsurl string
+)
+
+// SetNPSUrl 设置NPS服务器地址
+func SetNPSUrl(url string) {
+	npsurl = url
+}
 
 // InitLink 初始化连接 返回 conn, messageType, delay, error
 func InitLink(url string) (conn *websocket.Conn, mt int, delay int64, err error) {
@@ -23,16 +32,32 @@ func InitLink(url string) (conn *websocket.Conn, mt int, delay int64, err error)
 		log.Errorf("[initlink] %v", err)
 		return
 	}
-	recvt, err := strconv.ParseInt(data.Bytes2str(p), 10, 64)
+	var hello hello.Hello
+	err = hello.Unmarshal(p)
 	if err != nil {
-		log.Errorf("[initlink] parse int err: %v", err)
+		log.Errorf("[initlink] parse hello err: %v", err)
 		return
 	}
-	delay = recvt - t
+	delay = hello.Time - t
 	if delay <= 0 {
-		log.Errorf("[initlink] tr: %v, t: %v", recvt, t)
+		log.Errorf("[initlink] tr: %v, t: %v", hello.Time, t)
 		return
 	}
 	log.Printf("[initlink] %s 链接测试成功，延时%vns", url, delay)
 	return
+}
+
+var upgrader = websocket.Upgrader{}
+
+func InitEntry(ent string) {
+	myhello = hello.Hello{
+		Entry: ent,
+	}
+	http.HandleFunc("/"+ent, func(w http.ResponseWriter, r *http.Request) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err == nil {
+			go listenHello(conn)
+		}
+	})
+	http.Get(npsurl + "?ent=" + ent)
 }
