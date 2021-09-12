@@ -5,6 +5,7 @@ import (
 
 	"github.com/IPoWS/node-core/data/hello"
 	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
 )
 
 type WSNode struct {
@@ -21,6 +22,7 @@ var (
 func listenHello(conn *websocket.Conn) {
 	mt, p, err := conn.ReadMessage()
 	t := time.Now().UnixNano()
+	logrus.Info("[listenHello] recv hello.")
 	if err == nil {
 		var h hello.Hello
 		err = h.Unmarshal(p)
@@ -35,6 +37,7 @@ func listenHello(conn *websocket.Conn) {
 			}
 		}
 	}
+	logrus.Errorf("[listenHello] error: %v", err)
 	conn.Close()
 }
 
@@ -42,7 +45,11 @@ func listenHello(conn *websocket.Conn) {
 func sendHello(conn *websocket.Conn, mt int, h *hello.Hello) error {
 	data, err := h.Marshal()
 	if err == nil {
+		logrus.Info("[sendHello] send hello.")
 		err = conn.WriteMessage(mt, data)
+	}
+	if err != nil {
+		logrus.Errorf("[sendHello] error: %v", err)
 	}
 	return err
 }
