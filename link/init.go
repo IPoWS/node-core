@@ -59,5 +59,4 @@ func InitEntry(ent string) {
 			go listenHello(conn)
 		}
 	})
-	http.Get(npsurl + "?ent=" + ent)
 }
