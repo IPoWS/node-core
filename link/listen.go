@@ -26,7 +26,7 @@ func listen(conn *websocket.Conn) {
 			if err == nil {
 				switch ip.Prototype {
 				case ip64.HelloType:
-					logrus.Info("[listen] recv hello.")
+					logrus.Infof("[listen] recv hello with %d bytes data.", len(ip.Data))
 					t := time.Now().UnixNano()
 					var h hello.Hello
 					err = h.Unmarshal(ip.Data)
@@ -46,7 +46,7 @@ func listen(conn *websocket.Conn) {
 						}
 						return
 					} else {
-						logrus.Error("[listen]", err)
+						logrus.Error("[listen] ", err)
 					}
 				case ip64.NodesType: // 在地址列表更新后
 					logrus.Info("[listen] recv nodes.")
