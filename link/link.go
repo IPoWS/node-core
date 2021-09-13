@@ -46,8 +46,7 @@ func StartCheck(m *nodes.Nodes) {
 		}
 		router.SaveNodesBack()
 		t := time.NewTicker(time.Millisecond * 32768)
-		select {
-		case <-t.C:
+		for range t.C {
 			for i := range m.CopyIp64S() {
 				SendHello(i)
 				time.Sleep(time.Millisecond * 10)
@@ -61,7 +60,6 @@ func StartCheck(m *nodes.Nodes) {
 				}
 			}
 			logrus.Info("[checklink] check alive finished.")
-		default:
 		}
 	}()
 }
