@@ -38,6 +38,9 @@ func (m *Nodes) Load(nodesfile string) error {
 		Memmu.Unlock()
 	} else if os.IsNotExist(err) {
 		err = nil
+		m.Hosts = make(map[string]uint64)
+		m.Ip64S = make(map[uint64]string)
+		m.Nodes = make(map[string]string)
 	}
 	return err
 }
