@@ -5,14 +5,14 @@ import (
 
 	"github.com/IPoWS/node-core/data/hello"
 	"github.com/IPoWS/node-core/ip64"
+	"github.com/IPoWS/node-core/router"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
 
 type WSNode struct {
-	conn  *websocket.Conn
-	mt    int
-	delay int64
+	conn *websocket.Conn
+	mt   int
 }
 
 var (
@@ -36,7 +36,8 @@ func listen(conn *websocket.Conn) {
 					err = h.Unmarshal(ip.Data)
 					delay := t - h.Time
 					if err == nil && delay > 0 {
-						saveMap(ip.From, conn, mt, delay)
+						saveMap(ip.From, conn, mt)
+						router.AddItem(ip.From, ip.From, uint16(delay/1000000))
 						h = myhello
 						h.Time = time.Now().UnixNano()
 						err = sendHello(ip.From, &h)

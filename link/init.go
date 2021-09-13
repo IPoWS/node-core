@@ -6,6 +6,7 @@ import (
 
 	"github.com/IPoWS/node-core/data/hello"
 	"github.com/IPoWS/node-core/ip64"
+	"github.com/IPoWS/node-core/router"
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 )
@@ -54,7 +55,8 @@ func InitLink(url string) (conn *websocket.Conn, mt int, delay int64, err error)
 		log.Errorf("[initlink] tr: %v, t: %v", h.Time, t)
 		return
 	}
-	saveMap(ip.From, conn, mt, delay)
+	saveMap(ip.From, conn, mt)
+	router.AddItem(ip.From, ip.From, uint16(delay/1000000))
 	log.Printf("[initlink] %s 链接测试成功，延时%vns，对方ip: %x", url, delay, ip.From)
 	return
 }
