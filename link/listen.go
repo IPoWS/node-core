@@ -31,6 +31,7 @@ func listen(conn *websocket.Conn) {
 					var h hello.Hello
 					err = h.Unmarshal(ip.Data)
 					delay := t - h.Time
+					logrus.Infof("[listen] from: %x, to: %v, delay: %d.", ip.From, ip.To, delay)
 					if err == nil && delay > 0 {
 						saveMap(ip.From, conn)
 						router.AddItem(ip.From, ip.From, uint16(delay/1000000))
@@ -41,6 +42,7 @@ func listen(conn *websocket.Conn) {
 							if mywsip == 0 {
 								mywsip = ip.To
 								mymask = h.Mask
+								logrus.Infof("[listen] set my ip: %x with mask %x.", mywsip, mymask)
 							}
 							return
 						}
