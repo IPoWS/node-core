@@ -52,7 +52,7 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 		return ip.From, delay, err
 	}
 	saveMap(ip.From, conn)
-	router.AddItem(ip.From, ip.From, uint16(delay/1000000))
+	router.AddItem(ip.From, ip.From, uint16(delay/10000))
 	log.Printf("[initlink] 链接测试成功，延时%vns，对方ip: %x", delay, ip.From)
 	return ip.From, delay, nil
 }

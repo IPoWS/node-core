@@ -2,7 +2,9 @@ package link
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/IPoWS/node-core/data/nodes"
 	"github.com/IPoWS/node-core/ip64"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -29,4 +31,16 @@ func Forward(to uint64, ip *ip64.Ip64) error {
 		return ip.Send(wsn, websocket.BinaryMessage)
 	}
 	return fmt.Errorf("dest %x unreachable.", to)
+}
+
+func StartCheck(m *nodes.Nodes) {
+	t := time.NewTicker(time.Second * 10)
+	go func() {
+		for range t.C {
+			is := m.CopyIp64S()
+			for i := range is {
+				SendHello(i)
+			}
+		}
+	}()
 }

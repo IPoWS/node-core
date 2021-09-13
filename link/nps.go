@@ -17,6 +17,7 @@ func Register(ent string) {
 		data, err := io.ReadAll(resp.Body)
 		if err == nil {
 			router.ParseRawNodes(data)
+			StartCheck(router.Allnodes)
 		}
 	}
 	if err != nil {

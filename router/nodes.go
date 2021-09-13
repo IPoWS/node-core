@@ -29,7 +29,7 @@ func AddNode(host string, ent string, ip uint64) {
 	Nodesmu.Unlock()
 }
 
-func DelNode(host string) {
+func DelNodeByHost(host string) {
 	Nodesmu.Lock()
 	_, ok := Allnodes.Nodes[host]
 	if ok {
@@ -39,6 +39,17 @@ func DelNode(host string) {
 			delete(Allnodes.Hosts, host)
 			delete(Allnodes.Ip64S, ip)
 		}
+	}
+	Nodesmu.Unlock()
+}
+
+func DelNodeByIP(ip uint64) {
+	Nodesmu.Lock()
+	host, ok := Allnodes.Ip64S[ip]
+	if ok {
+		delete(Allnodes.Nodes, host)
+		delete(Allnodes.Hosts, host)
+		delete(Allnodes.Ip64S, ip)
 	}
 	Nodesmu.Unlock()
 }

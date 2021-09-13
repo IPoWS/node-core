@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	myhello hello.Hello
+	myhello  hello.Hello
+	alivemap = make(map[uint64]bool)
 )
 
 // listen 监听其他节点发来的包
@@ -32,9 +33,10 @@ func listen(conn *websocket.Conn) {
 					err = h.Unmarshal(ip.Data)
 					delay := t - h.Time
 					logrus.Infof("[listen] from: %x, to: %x, delay: %d ns.", ip.From, ip.To, delay)
+					alivemap[ip.From] = true
 					if err == nil && delay > 0 && ip.From > 0 && ip.To > 0 {
 						saveMap(ip.From, conn)
-						router.AddItem(ip.From, ip.From, uint16(delay/1000000))
+						router.AddItem(ip.From, ip.From, uint16(delay/10000))
 					}
 					if err == nil {
 						if mywsip == 0 {
@@ -55,7 +57,7 @@ func listen(conn *websocket.Conn) {
 					newnodes.Unmarshal(ip.Data)
 					for h, e := range newnodes.Nodes {
 						if e == "" {
-							router.DelNode(h)
+							router.DelNodeByHost(h)
 						} else {
 							router.AddNode(h, e, newnodes.Hosts[h])
 							InitLink(h+e, 0)
@@ -67,6 +69,13 @@ func listen(conn *websocket.Conn) {
 	}
 	logrus.Errorf("[listen] %v", err)
 	conn.Close()
+}
+
+// SendHello 从自身发送 hello 给对方
+func SendHello(to uint64) error {
+	h := myhello
+	h.Time = time.Now().UnixNano()
+	return sendHello(to, &h)
 }
 
 // sendHello 发送 hello 给对方
@@ -82,6 +91,18 @@ func sendHello(wsip uint64, h *hello.Hello) error {
 		}
 		if err != nil {
 			logrus.Errorf("[sendHello] %v", err)
+		} else {
+			go func() {
+				alivemap[wsip] = false
+				// sleep 65.536 s
+				time.Sleep(time.Millisecond * 65536)
+				if !alivemap[wsip] {
+					logrus.Infof("[sendHello] %d is unreachable and del it from table.", wsip)
+					router.DelItem(wsip)
+					router.DelNodeByIP(wsip)
+					delMap(wsip)
+				}
+			}()
 		}
 		return err
 	} else {

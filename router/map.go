@@ -11,7 +11,7 @@ type transItem struct {
 type TransTable struct {
 	// to -> ti
 	table map[uint64]*transItem
-	// delay -> ti
+	// delay / 0.01ms -> ti
 	delays [65536]*transItem
 	mu     sync.RWMutex
 }
