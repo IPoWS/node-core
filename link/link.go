@@ -34,7 +34,7 @@ func Forward(to uint64, ip *ip64.Ip64) error {
 }
 
 func StartCheck(m *nodes.Nodes) {
-	t := time.NewTicker(time.Second * 10)
+	t := time.NewTicker(time.Microsecond * 655360)
 	go func() {
 		for range t.C {
 			is := m.CopyIp64S()
