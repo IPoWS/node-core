@@ -57,7 +57,7 @@ func listen(conn *websocket.Conn) {
 						if e == "" {
 							router.DelNode(h)
 						} else {
-							router.AddNode(h, e)
+							router.AddNode(h, e, newnodes.Hosts[h])
 							InitLink(h+e, 0)
 						}
 					}

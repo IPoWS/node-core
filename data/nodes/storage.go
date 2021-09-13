@@ -6,41 +6,37 @@ import (
 )
 
 var (
-	Filemu    sync.RWMutex
-	Memmu     sync.RWMutex
-	Nodesfile string
+	filemu sync.RWMutex
+	memmu  sync.RWMutex
 )
 
-func (m *Nodes) Save() error {
-	if Nodesfile == "" {
-		Nodesfile = "./nodes"
+func (m *Nodes) Save(nodesfile string) error {
+	if nodesfile == "" {
+		nodesfile = "./nodes"
 	}
-	Memmu.RLock()
+	memmu.RLock()
 	data, err := m.Marshal()
-	Memmu.RUnlock()
+	memmu.RUnlock()
 	if err == nil {
-		Filemu.Lock()
-		err = os.WriteFile(Nodesfile, data, 0644)
-		Filemu.Unlock()
+		filemu.Lock()
+		err = os.WriteFile(nodesfile, data, 0644)
+		filemu.Unlock()
 	}
 	return err
 }
 
-func (m *Nodes) Load() error {
-	if Nodesfile == "" {
-		Nodesfile = "./nodes"
+func (m *Nodes) Load(nodesfile string) error {
+	if nodesfile == "" {
+		nodesfile = "./nodes"
 	}
-	Filemu.RLock()
-	data, err := os.ReadFile(Nodesfile)
-	Filemu.RUnlock()
+	filemu.RLock()
+	data, err := os.ReadFile(nodesfile)
+	filemu.RUnlock()
 	if err == nil {
-		Memmu.Lock()
+		memmu.Lock()
 		err = m.Unmarshal(data)
-		Memmu.Unlock()
+		memmu.Unlock()
 	} else if os.IsNotExist(err) {
-		Memmu.Lock()
-		m.Nodes = make(map[string]string)
-		Memmu.Unlock()
 		err = nil
 	}
 	return err

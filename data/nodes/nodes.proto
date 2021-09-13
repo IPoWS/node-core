@@ -4,4 +4,8 @@ package nodes;
 message Nodes {
     // real ip:port to entry
     map<string, string> nodes = 1;
+    // ip64 to real ip:port
+    map<uint64, string> ip64s = 2;
+    // real ip:port to ip64
+    map<string, uint64> hosts = 3;
 }
