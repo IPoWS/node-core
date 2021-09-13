@@ -31,22 +31,22 @@ func listen(conn *websocket.Conn) {
 					var h hello.Hello
 					err = h.Unmarshal(ip.Data)
 					delay := t - h.Time
-					logrus.Infof("[listen] from: %x, to: %x, delay: %d ms.", ip.From, ip.To, delay/1000000)
+					logrus.Infof("[listen] from: %x, to: %x, delay: %d ns.", ip.From, ip.To, delay)
 					if err == nil && delay > 0 && ip.From > 0 && ip.To > 0 {
 						saveMap(ip.From, conn)
 						router.AddItem(ip.From, ip.From, uint16(delay/1000000))
-						h = myhello
-						h.Time = time.Now().UnixNano()
-						err = sendHello(ip.From, &h)
-					} else if err == nil {
+					}
+					if err == nil {
 						if mywsip == 0 {
 							mywsip = ip.To
 							mymask = h.Mask
 							logrus.Infof("[listen] set my ip: %x with mask %x.", mywsip, mymask)
 						}
-						return
-					} else {
-						logrus.Error("[listen] ", err)
+						if mywsip > 0 {
+							h = myhello
+							h.Time = time.Now().UnixNano()
+							err = sendHello(mywsip, &h)
+						}
 					}
 				case ip64.NodesType: // 在地址列表更新后
 					logrus.Info("[listen] recv nodes.")
