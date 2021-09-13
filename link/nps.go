@@ -2,16 +2,17 @@ package link
 
 import (
 	"io"
-	"net/http"
 
 	"github.com/IPoWS/node-core/data/nodes"
 	"github.com/IPoWS/node-core/ip64"
 	"github.com/IPoWS/node-core/router"
+	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
 
 func Register(ent string) {
-	resp, err := http.Get(npsurl + "ent?ent=" + ent)
+	conn, resp, err := websocket.DefaultDialer.Dial(npsurl+"?ent="+ent, nil)
+	go listen(conn)
 	if err == nil {
 		data, err := io.ReadAll(resp.Body)
 		if err == nil {
