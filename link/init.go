@@ -29,8 +29,8 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 	if adviceip > 0 {
 		h.Mask = 0xffff_ffff_0000_0000
 	}
-	sendHelloUnknown(conn, 0, &h, adviceip)
-	mt, p, err := conn.ReadMessage()
+	sendHelloUnknown(conn, &h, adviceip)
+	_, p, err := conn.ReadMessage()
 	if err != nil {
 		log.Errorf("[initlink] %v", err)
 		return adviceip, 0, err
@@ -51,7 +51,7 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 		log.Errorf("[initlink] tr: %v, t: %v", h.Time, t)
 		return ip.From, delay, err
 	}
-	saveMap(ip.From, conn, mt)
+	saveMap(ip.From, conn)
 	router.AddItem(ip.From, ip.From, uint16(delay/1000000))
 	log.Printf("[initlink] 链接测试成功，延时%vns，对方ip: %x", delay, ip.From)
 	return ip.From, delay, nil

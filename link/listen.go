@@ -11,11 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type WSNode struct {
-	conn *websocket.Conn
-	mt   int
-}
-
 var (
 	myhello hello.Hello
 )
@@ -24,12 +19,11 @@ var (
 func listen(conn *websocket.Conn) {
 	var err error
 	for err == nil {
-		mt, p, err := conn.ReadMessage()
+		_, p, err := conn.ReadMessage()
 		if err == nil {
 			var ip ip64.Ip64
 			err := ip.Unmarshal(p)
 			if err == nil {
-				updateMt(ip.From, mt)
 				switch ip.Prototype {
 				case ip64.HelloType:
 					logrus.Info("[listen] recv hello.")
@@ -38,7 +32,7 @@ func listen(conn *websocket.Conn) {
 					err = h.Unmarshal(ip.Data)
 					delay := t - h.Time
 					if err == nil && delay > 0 {
-						saveMap(ip.From, conn, mt)
+						saveMap(ip.From, conn)
 						router.AddItem(ip.From, ip.From, uint16(delay/1000000))
 						h = myhello
 						h.Time = time.Now().UnixNano()
@@ -80,7 +74,7 @@ func sendHello(wsip uint64, h *hello.Hello) error {
 			var ip ip64.Ip64
 			ip.Pack(mywsip, wsip, 0, 0, &data, uintptr(len(data)), ip64.HelloType)
 			logrus.Info("[sendHello] send hello.")
-			err = ip.Send(wsn.conn, wsn.mt)
+			err = ip.Send(wsn, websocket.BinaryMessage)
 		}
 		if err != nil {
 			logrus.Errorf("[sendHello] %v", err)
@@ -93,13 +87,13 @@ func sendHello(wsip uint64, h *hello.Hello) error {
 }
 
 // sendHelloUnknown 发送 hello 给未知 ip 方
-func sendHelloUnknown(conn *websocket.Conn, mt int, h *hello.Hello, adviceip uint64) error {
+func sendHelloUnknown(conn *websocket.Conn, h *hello.Hello, adviceip uint64) error {
 	data, err := h.Marshal()
 	if err == nil {
 		var ip ip64.Ip64
 		ip.Pack(mywsip, adviceip, 0, 0, &data, uintptr(len(data)), ip64.HelloType)
 		logrus.Info("[sendHello] send hello.")
-		err = ip.Send(conn, mt)
+		err = ip.Send(conn, websocket.BinaryMessage)
 	}
 	if err != nil {
 		logrus.Errorf("[sendHello] %v", err)

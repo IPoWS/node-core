@@ -29,10 +29,10 @@ func NotifyChange(n *nodes.Nodes) {
 	data, err := n.Marshal()
 	if err == nil {
 		for to, wsn := range connmap {
-			if to > 0 && wsn.conn != nil {
+			if to > 0 && wsn != nil {
 				var ip ip64.Ip64
 				ip.Pack(mywsip, to, 0, 0, &data, uintptr(len(data)), ip64.NodesType)
-				ip.Send(wsn.conn, wsn.mt)
+				ip.Send(wsn, websocket.BinaryMessage)
 			}
 		}
 	}
