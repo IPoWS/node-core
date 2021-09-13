@@ -22,14 +22,7 @@ func SetNPSUrl(url string) {
 	npsurl = url
 }
 
-// InitLink 初始化连接 返回 wsip delay error
-func InitLink(url string, adviceip uint64) (uint64, int64, error) {
-	log.Printf("[initlink] connecting to %s", url)
-	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
-	if err != nil {
-		log.Errorf("[initlink] %v", err)
-		return 0, 0, err
-	}
+func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 	t := time.Now().UnixNano()
 	h := myhello
 	h.Time = t
@@ -60,12 +53,24 @@ func InitLink(url string, adviceip uint64) (uint64, int64, error) {
 	}
 	saveMap(ip.From, conn, mt)
 	router.AddItem(ip.From, ip.From, uint16(delay/1000000))
-	log.Printf("[initlink] %s 链接测试成功，延时%vns，对方ip: %x", url, delay, ip.From)
+	log.Printf("[initlink] 链接测试成功，延时%vns，对方ip: %x", delay, ip.From)
 	return ip.From, delay, nil
+}
+
+// InitLink 初始化连接 返回 wsip delay error, usl 必须以 ws:// 开头
+func InitLink(url string, adviceip uint64) (uint64, int64, error) {
+	log.Printf("[initlink] connecting to %s", url)
+	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
+	if err != nil {
+		log.Errorf("[initlink] %v", err)
+		return 0, 0, err
+	}
+	return initLink(conn, adviceip)
 }
 
 var upgrader = websocket.Upgrader{}
 
+// InitEntry 初始化 ws entry
 func InitEntry(ent string) {
 	myhello = hello.Hello{
 		Entry: ent,
@@ -76,4 +81,13 @@ func InitEntry(ent string) {
 			go listen(conn)
 		}
 	})
+}
+
+// UpgradeLink 直接升级连接
+func UpgradeLink(w http.ResponseWriter, r *http.Request, adviceip uint64) (uint64, int64, error) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err == nil {
+		return initLink(conn, adviceip)
+	}
+	return 0, 0, err
 }
