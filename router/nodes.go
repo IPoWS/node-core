@@ -12,6 +12,7 @@ var (
 )
 
 func init() {
+	Allnodes = new(nodes.Nodes)
 	Allnodes.Hosts = make(map[string]uint64)
 	Allnodes.Ip64S = make(map[uint64]string)
 	Allnodes.Nodes = make(map[string]string)
