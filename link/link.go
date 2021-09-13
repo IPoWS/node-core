@@ -61,6 +61,7 @@ func StartCheck(m *nodes.Nodes) {
 				}
 			}
 			logrus.Info("[checklink] check alive finished.")
+		default:
 		}
 	}()
 }
