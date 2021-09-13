@@ -41,6 +41,7 @@ func StartCheck(m *nodes.Nodes) {
 			wsip, _, err := InitLink("ws://"+host+"/"+n[host], ip)
 			if err != nil || wsip != ip {
 				router.DelNodeByIP(ip)
+				logrus.Infof("[linkcheck] del %x -> %s.", ip, host)
 			}
 		}
 		router.SaveNodesBack()

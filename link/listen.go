@@ -1,6 +1,7 @@
 package link
 
 import (
+	"sync"
 	"time"
 
 	"github.com/IPoWS/node-core/data/hello"
@@ -14,6 +15,7 @@ import (
 var (
 	myhello  hello.Hello
 	alivemap = make(map[uint64]bool)
+	alimu    sync.RWMutex
 )
 
 // listen 监听其他节点发来的包
@@ -33,7 +35,9 @@ func listen(conn *websocket.Conn) {
 					err = h.Unmarshal(ip.Data)
 					delay := t - h.Time
 					logrus.Infof("[listen] from: %x, to: %x, delay: %d ns.", ip.From, ip.To, delay)
+					alimu.Lock()
 					alivemap[ip.From] = true
+					alimu.Unlock()
 					if err == nil && delay > 0 && ip.From > 0 && ip.To > 0 {
 						saveMap(ip.From, conn)
 						router.AddItem(ip.From, ip.From, uint16(delay/10000))
@@ -80,7 +84,12 @@ func SendHello(to uint64) error {
 
 // sendHello 发送 hello 给对方
 func sendHello(wsip uint64, h *hello.Hello) error {
+	connmu.RLock()
 	wsn, ok := connmap[wsip]
+	connmu.RUnlock()
+	alimu.Lock()
+	alivemap[wsip] = false
+	alimu.Unlock()
 	if ok {
 		data, err := h.Marshal()
 		if err == nil {
@@ -93,11 +102,13 @@ func sendHello(wsip uint64, h *hello.Hello) error {
 			logrus.Errorf("[sendHello] %v", err)
 		} else {
 			go func() {
-				alivemap[wsip] = false
 				// sleep 65.536 s
 				time.Sleep(time.Millisecond * 65536)
-				if !alivemap[wsip] {
-					logrus.Infof("[sendHello] %d is unreachable and del it from table.", wsip)
+				alimu.RLock()
+				ok = alivemap[wsip]
+				alimu.RUnlock()
+				if !ok {
+					logrus.Infof("[sendHello] %x is unreachable and del it from table.", wsip)
 					router.DelItem(wsip)
 					router.DelNodeByIP(wsip)
 					delMap(wsip)
