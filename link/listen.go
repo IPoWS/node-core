@@ -31,8 +31,8 @@ func listen(conn *websocket.Conn) {
 					var h hello.Hello
 					err = h.Unmarshal(ip.Data)
 					delay := t - h.Time
-					logrus.Infof("[listen] from: %x, to: %v, delay: %d.", ip.From, ip.To, delay)
-					if err == nil && delay > 0 {
+					logrus.Infof("[listen] from: %x, to: %x, delay: %d ms.", ip.From, ip.To, delay/1000000)
+					if err == nil && delay > 0 && ip.From > 0 && ip.To > 0 {
 						saveMap(ip.From, conn)
 						router.AddItem(ip.From, ip.From, uint16(delay/1000000))
 						h = myhello
