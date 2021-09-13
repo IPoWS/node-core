@@ -6,6 +6,7 @@ import (
 
 	"github.com/IPoWS/node-core/data/nodes"
 	"github.com/IPoWS/node-core/ip64"
+	"github.com/IPoWS/node-core/router"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
@@ -34,11 +35,18 @@ func Forward(to uint64, ip *ip64.Ip64) error {
 }
 
 func StartCheck(m *nodes.Nodes) {
-	t := time.NewTicker(time.Microsecond * 655360)
 	go func() {
+		n := m.CopyNodes()
+		for ip, host := range m.CopyIp64S() {
+			wsip, _, err := InitLink("ws://"+host+"/"+n[host], ip)
+			if err != nil || wsip != ip {
+				router.DelNodeByIP(ip)
+			}
+		}
+		router.SaveNodesBack()
+		t := time.NewTicker(time.Millisecond * 65536)
 		for range t.C {
-			is := m.CopyIp64S()
-			for i := range is {
+			for i := range m.CopyIp64S() {
 				SendHello(i)
 			}
 		}

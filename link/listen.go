@@ -94,8 +94,8 @@ func sendHello(wsip uint64, h *hello.Hello) error {
 		} else {
 			go func() {
 				alivemap[wsip] = false
-				// sleep 655.36 ms
-				time.Sleep(time.Microsecond * 655360)
+				// sleep 65.536 s
+				time.Sleep(time.Millisecond * 65536)
 				if !alivemap[wsip] {
 					logrus.Infof("[sendHello] %d is unreachable and del it from table.", wsip)
 					router.DelItem(wsip)
