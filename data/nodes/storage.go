@@ -6,21 +6,21 @@ import (
 )
 
 var (
-	filemu sync.RWMutex
-	memmu  sync.RWMutex
+	Filemu sync.RWMutex
+	Memmu  sync.RWMutex
 )
 
 func (m *Nodes) Save(nodesfile string) error {
 	if nodesfile == "" {
 		nodesfile = "./nodes"
 	}
-	memmu.RLock()
+	Memmu.RLock()
 	data, err := m.Marshal()
-	memmu.RUnlock()
+	Memmu.RUnlock()
 	if err == nil {
-		filemu.Lock()
+		Filemu.Lock()
 		err = os.WriteFile(nodesfile, data, 0644)
-		filemu.Unlock()
+		Filemu.Unlock()
 	}
 	return err
 }
@@ -29,13 +29,13 @@ func (m *Nodes) Load(nodesfile string) error {
 	if nodesfile == "" {
 		nodesfile = "./nodes"
 	}
-	filemu.RLock()
+	Filemu.RLock()
 	data, err := os.ReadFile(nodesfile)
-	filemu.RUnlock()
+	Filemu.RUnlock()
 	if err == nil {
-		memmu.Lock()
+		Memmu.Lock()
 		err = m.Unmarshal(data)
-		memmu.Unlock()
+		Memmu.Unlock()
 	} else if os.IsNotExist(err) {
 		err = nil
 	}
