@@ -8,6 +8,5 @@ message ip64 {
     uint64 to = 3;
     // from+to ports
     uint32 ports = 4;
-    uint32 datlen = 5;
-    bytes data = 6;
+    bytes data = 5;
 }

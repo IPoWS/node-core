@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	link.SetNPSUrl("http://127.0.0.1:8080/nps")
+	link.SetNPSUrl("127.0.0.1:8080/nps")
 	link.InitEntry("123456")
 	link.Register("123456")
 	select {}

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/IPoWS/node-core/data/hello"
+	"github.com/IPoWS/node-core/data/nodes"
 	"github.com/IPoWS/node-core/ip64"
 	"github.com/IPoWS/node-core/router"
 	"github.com/gorilla/websocket"
@@ -28,9 +29,10 @@ func listen(conn *websocket.Conn) {
 			var ip ip64.Ip64
 			err := ip.Unmarshal(p)
 			if err == nil {
+				updateMt(ip.From, mt)
 				switch ip.Prototype {
 				case ip64.HelloType:
-					logrus.Info("[listenHello] recv hello.")
+					logrus.Info("[listen] recv hello.")
 					t := time.Now().UnixNano()
 					var h hello.Hello
 					err = h.Unmarshal(ip.Data)
@@ -49,13 +51,23 @@ func listen(conn *websocket.Conn) {
 							return
 						}
 					}
-				case ip64.NodesType:
+				case ip64.NodesType: // 在地址列表更新后
+					logrus.Info("[listen] recv nodes.")
+					var newnodes nodes.Nodes
+					newnodes.Unmarshal(ip.Data)
+					for h, e := range newnodes.Nodes {
+						if e == "" {
+							router.DelNode(h)
+						} else {
+							router.AddNode(h, e)
+							InitLink(h+e, 0)
+						}
+					}
 				}
-				updateMt(ip.From, mt)
 			}
 		}
 	}
-	logrus.Errorf("[listenHello] %v", err)
+	logrus.Errorf("[listen] %v", err)
 	conn.Close()
 }
 
