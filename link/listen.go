@@ -75,7 +75,7 @@ func sendHello(wsip uint64, h *hello.Hello) error {
 		data, err := h.Marshal()
 		if err == nil {
 			var ip ip64.Ip64
-			ip.Pack(mywsip, wsip, 0, 0, &data, uintptr(len(data)), ip64.HelloType)
+			ip.Pack(mywsip, wsip, 0, 0, &data, ip64.HelloType)
 			logrus.Info("[sendHello] send hello.")
 			err = ip.Send(wsn, websocket.BinaryMessage)
 		}
@@ -94,7 +94,7 @@ func sendHelloUnknown(conn *websocket.Conn, h *hello.Hello, adviceip uint64) err
 	data, err := h.Marshal()
 	if err == nil {
 		var ip ip64.Ip64
-		ip.Pack(mywsip, adviceip, 0, 0, &data, uintptr(len(data)), ip64.HelloType)
+		ip.Pack(mywsip, adviceip, 0, 0, &data, ip64.HelloType)
 		logrus.Info("[sendHello] send hello.")
 		err = ip.Send(conn, websocket.BinaryMessage)
 	}
