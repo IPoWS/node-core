@@ -8,4 +8,6 @@ message Nodes {
     map<uint64, string> ip64s = 2;
     // real ip:port to ip64
     map<string, uint64> hosts = 3;
+    // ip64 to last alive time
+    map<uint64, uint64> times = 4;
 }

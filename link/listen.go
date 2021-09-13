@@ -1,7 +1,6 @@
 package link
 
 import (
-	"sync"
 	"time"
 
 	"github.com/IPoWS/node-core/data/hello"
@@ -13,9 +12,7 @@ import (
 )
 
 var (
-	myhello  hello.Hello
-	alivemap = make(map[uint64]bool)
-	alimu    sync.RWMutex
+	myhello hello.Hello
 )
 
 // listen 监听其他节点发来的包
@@ -35,12 +32,10 @@ func listen(conn *websocket.Conn) {
 					err = h.Unmarshal(ip.Data)
 					delay := t - h.Time
 					logrus.Infof("[listen] from: %x, to: %x, delay: %d ns.", ip.From, ip.To, delay)
-					alimu.Lock()
-					alivemap[ip.From] = true
-					alimu.Unlock()
 					if err == nil && delay > 0 && ip.From > 0 && ip.To > 0 {
 						saveMap(ip.From, conn)
 						router.AddItem(ip.From, ip.From, uint16(delay/10000))
+						router.FlushAlive(ip.From, uint64(time.Now().UnixNano()))
 					}
 					if err == nil {
 						if mywsip == 0 {
@@ -63,7 +58,7 @@ func listen(conn *websocket.Conn) {
 						if e == "" {
 							router.DelNodeByHost(h)
 						} else {
-							router.AddNode(h, e, newnodes.Hosts[h])
+							router.AddNode(h, e, newnodes.Hosts[h], uint64(time.Now().UnixNano()))
 							InitLink(h+e, 0)
 						}
 					}
@@ -82,14 +77,19 @@ func SendHello(to uint64) error {
 	return sendHello(to, &h)
 }
 
+func DelConn(wsip uint64) {
+	logrus.Infof("[delconn] %x is unreachable and del it from table.", wsip)
+	router.DelItem(wsip)
+	router.DelNodeByIP(wsip)
+	delMap(wsip)
+	router.SaveNodesBack()
+}
+
 // sendHello 发送 hello 给对方
 func sendHello(wsip uint64, h *hello.Hello) error {
 	connmu.RLock()
 	wsn, ok := connmap[wsip]
 	connmu.RUnlock()
-	alimu.Lock()
-	alivemap[wsip] = false
-	alimu.Unlock()
 	if ok {
 		data, err := h.Marshal()
 		if err == nil {
@@ -100,21 +100,6 @@ func sendHello(wsip uint64, h *hello.Hello) error {
 		}
 		if err != nil {
 			logrus.Errorf("[sendHello] %v", err)
-		} else {
-			go func() {
-				// sleep 65.536 s
-				time.Sleep(time.Millisecond * 65536)
-				alimu.RLock()
-				ok = alivemap[wsip]
-				alimu.RUnlock()
-				if !ok {
-					logrus.Infof("[sendHello] %x is unreachable and del it from table.", wsip)
-					router.DelItem(wsip)
-					router.DelNodeByIP(wsip)
-					delMap(wsip)
-					router.SaveNodesBack()
-				}
-			}()
 		}
 		return err
 	} else {

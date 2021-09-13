@@ -40,6 +40,7 @@ func (m *Nodes) Load(nodesfile string) error {
 		m.Hosts = make(map[string]uint64)
 		m.Ip64S = make(map[uint64]string)
 		m.Nodes = make(map[string]string)
+		m.Times = make(map[uint64]uint64)
 	}
 	return err
 }
@@ -68,6 +69,16 @@ func (m *Nodes) CopyHosts() map[string]uint64 {
 	Memmu.RLock()
 	ret := make(map[string]uint64, len(m.Hosts))
 	for k, v := range m.Hosts {
+		ret[k] = v
+	}
+	Memmu.RUnlock()
+	return ret
+}
+
+func (m *Nodes) CopyTimes() map[uint64]uint64 {
+	Memmu.RLock()
+	ret := make(map[uint64]uint64, len(m.Times))
+	for k, v := range m.Times {
 		ret[k] = v
 	}
 	Memmu.RUnlock()

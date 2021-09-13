@@ -45,10 +45,19 @@ func StartCheck(m *nodes.Nodes) {
 			}
 		}
 		router.SaveNodesBack()
-		t := time.NewTicker(time.Millisecond * 65536)
-		for range t.C {
+		t := time.NewTicker(time.Millisecond * 32768)
+		t2 := time.NewTicker(time.Millisecond * 65536)
+		select {
+		case <-t.C:
 			for i := range m.CopyIp64S() {
 				SendHello(i)
+			}
+		case <-t2.C:
+			now := uint64(time.Now().UnixNano())
+			for i, t := range m.CopyTimes() {
+				if now-t > 65536*1000000 {
+					DelConn(i)
+				}
 			}
 		}
 	}()

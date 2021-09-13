@@ -22,11 +22,18 @@ func ParseRawNodes(d []byte) error {
 	return Allnodes.Unmarshal(d)
 }
 
-func AddNode(host string, ent string, ip uint64) {
+func AddNode(host string, ent string, ip uint64, time uint64) {
 	Nodesmu.Lock()
 	Allnodes.Nodes[host] = ent
 	Allnodes.Ip64S[ip] = host
 	Allnodes.Hosts[host] = ip
+	Allnodes.Times[ip] = time
+	Nodesmu.Unlock()
+}
+
+func FlushAlive(ip uint64, time uint64) {
+	Nodesmu.Lock()
+	Allnodes.Times[ip] = time
 	Nodesmu.Unlock()
 }
 
@@ -39,6 +46,7 @@ func DelNodeByHost(host string) {
 		if ok {
 			delete(Allnodes.Hosts, host)
 			delete(Allnodes.Ip64S, ip)
+			delete(Allnodes.Times, ip)
 		}
 	}
 	Nodesmu.Unlock()
@@ -51,6 +59,7 @@ func DelNodeByIP(ip uint64) {
 		delete(Allnodes.Nodes, host)
 		delete(Allnodes.Hosts, host)
 		delete(Allnodes.Ip64S, ip)
+		delete(Allnodes.Times, ip)
 	}
 	Nodesmu.Unlock()
 }
