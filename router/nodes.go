@@ -18,8 +18,6 @@ func init() {
 func ParseRawNodes(d []byte) error {
 	defer Nodesmu.Unlock()
 	Nodesmu.Lock()
-	Allnodes = new(nodes.Nodes)
-	Allnodes.Nodes = make(map[string]string)
 	return Allnodes.Unmarshal(d)
 }
 
