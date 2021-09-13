@@ -11,7 +11,7 @@ import (
 )
 
 func Register(ent string) {
-	resp, err := http.Get(npsurl + "?ent=" + ent)
+	resp, err := http.Get(npsurl + "ent?ent=" + ent)
 	if err == nil {
 		data, err := io.ReadAll(resp.Body)
 		if err == nil {
