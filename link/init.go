@@ -22,13 +22,13 @@ func SetNPSUrl(url string) {
 	npsurl = url
 }
 
-// InitLink 初始化连接 返回 conn, messageType, delay, error
-func InitLink(url string, adviceip uint64) (conn *websocket.Conn, mt int, delay int64, err error) {
+// InitLink 初始化连接 返回 wsip delay error
+func InitLink(url string, adviceip uint64) (uint64, int64, error) {
 	log.Printf("[initlink] connecting to %s", url)
-	conn, _, err = websocket.DefaultDialer.Dial(url, nil)
+	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		log.Errorf("[initlink] %v", err)
-		return
+		return 0, 0, err
 	}
 	t := time.Now().UnixNano()
 	h := myhello
@@ -36,32 +36,32 @@ func InitLink(url string, adviceip uint64) (conn *websocket.Conn, mt int, delay 
 	if adviceip > 0 {
 		h.Mask = 0xffff_ffff_0000_0000
 	}
-	sendHelloUnknown(conn, mt, &h, adviceip)
+	sendHelloUnknown(conn, 0, &h, adviceip)
 	mt, p, err := conn.ReadMessage()
 	if err != nil {
 		log.Errorf("[initlink] %v", err)
-		return
+		return adviceip, 0, err
 	}
 	var ip ip64.Ip64
 	err = ip.Unmarshal(p)
 	if err != nil {
 		log.Errorf("[initlink] parse ip63 err: %v", err)
-		return
+		return ip.From, 0, err
 	}
 	err = h.Unmarshal(ip.Data)
 	if err != nil {
 		log.Errorf("[initlink] parse hello err: %v", err)
-		return
+		return ip.From, 0, err
 	}
-	delay = h.Time - t
+	delay := h.Time - t
 	if delay <= 0 {
 		log.Errorf("[initlink] tr: %v, t: %v", h.Time, t)
-		return
+		return ip.From, delay, err
 	}
 	saveMap(ip.From, conn, mt)
 	router.AddItem(ip.From, ip.From, uint16(delay/1000000))
 	log.Printf("[initlink] %s 链接测试成功，延时%vns，对方ip: %x", url, delay, ip.From)
-	return
+	return ip.From, delay, nil
 }
 
 var upgrader = websocket.Upgrader{}
