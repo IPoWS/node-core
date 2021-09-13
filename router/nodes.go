@@ -7,50 +7,50 @@ import (
 )
 
 var (
-	allnodes *nodes.Nodes
-	nodesmu  sync.RWMutex
+	Allnodes *nodes.Nodes
+	Nodesmu  sync.RWMutex
 )
 
 func init() {
-	allnodes.Hosts = make(map[string]uint64)
-	allnodes.Ip64S = make(map[uint64]string)
-	allnodes.Nodes = make(map[string]string)
+	Allnodes.Hosts = make(map[string]uint64)
+	Allnodes.Ip64S = make(map[uint64]string)
+	Allnodes.Nodes = make(map[string]string)
 }
 
 func ParseRawNodes(d []byte) error {
-	defer nodesmu.Unlock()
-	nodesmu.Lock()
-	allnodes = new(nodes.Nodes)
-	allnodes.Nodes = make(map[string]string)
-	return allnodes.Unmarshal(d)
+	defer Nodesmu.Unlock()
+	Nodesmu.Lock()
+	Allnodes = new(nodes.Nodes)
+	Allnodes.Nodes = make(map[string]string)
+	return Allnodes.Unmarshal(d)
 }
 
 func AddNode(host string, ent string, ip uint64) {
-	nodesmu.Lock()
-	allnodes.Nodes[host] = ent
-	allnodes.Ip64S[ip] = host
-	allnodes.Hosts[host] = ip
-	nodesmu.Unlock()
+	Nodesmu.Lock()
+	Allnodes.Nodes[host] = ent
+	Allnodes.Ip64S[ip] = host
+	Allnodes.Hosts[host] = ip
+	Nodesmu.Unlock()
 }
 
 func DelNode(host string) {
-	nodesmu.Lock()
-	_, ok := allnodes.Nodes[host]
+	Nodesmu.Lock()
+	_, ok := Allnodes.Nodes[host]
 	if ok {
-		delete(allnodes.Nodes, host)
-		ip, ok := allnodes.Hosts[host]
+		delete(Allnodes.Nodes, host)
+		ip, ok := Allnodes.Hosts[host]
 		if ok {
-			delete(allnodes.Hosts, host)
-			delete(allnodes.Ip64S, ip)
+			delete(Allnodes.Hosts, host)
+			delete(Allnodes.Ip64S, ip)
 		}
 	}
-	nodesmu.Unlock()
+	Nodesmu.Unlock()
 }
 
 func SaveNodes(nodesfile string) {
-	allnodes.Save(nodesfile)
+	Allnodes.Save(nodesfile)
 }
 
 func LoadNodes(nodesfile string) {
-	allnodes.Load(nodesfile)
+	Allnodes.Load(nodesfile)
 }
