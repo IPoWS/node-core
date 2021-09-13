@@ -38,14 +38,13 @@ func listen(conn *websocket.Conn) {
 						h = myhello
 						h.Time = time.Now().UnixNano()
 						err = sendHello(ip.From, &h)
-						if err == nil {
-							if mywsip == 0 {
-								mywsip = ip.To
-								mymask = h.Mask
-								logrus.Infof("[listen] set my ip: %x with mask %x.", mywsip, mymask)
-							}
-							return
+					} else if err == nil {
+						if mywsip == 0 {
+							mywsip = ip.To
+							mymask = h.Mask
+							logrus.Infof("[listen] set my ip: %x with mask %x.", mywsip, mymask)
 						}
+						return
 					}
 				case ip64.NodesType: // 在地址列表更新后
 					logrus.Info("[listen] recv nodes.")
