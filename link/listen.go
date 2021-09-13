@@ -101,6 +101,7 @@ func sendHello(wsip uint64, h *hello.Hello) error {
 					router.DelItem(wsip)
 					router.DelNodeByIP(wsip)
 					delMap(wsip)
+					router.SaveNodesBack()
 				}
 			}()
 		}

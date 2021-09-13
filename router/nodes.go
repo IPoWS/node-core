@@ -9,6 +9,7 @@ import (
 var (
 	Allnodes *nodes.Nodes
 	Nodesmu  sync.RWMutex
+	nfile    string
 )
 
 func init() {
@@ -58,6 +59,11 @@ func SaveNodes(nodesfile string) error {
 	return Allnodes.Save(nodesfile)
 }
 
+func SaveNodesBack() error {
+	return Allnodes.Save(nfile)
+}
+
 func LoadNodes(nodesfile string) error {
+	nfile = nodesfile
 	return Allnodes.Load(nodesfile)
 }
