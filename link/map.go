@@ -8,13 +8,20 @@ import (
 
 var (
 	connmap = make(map[uint64]*WSNode)
-	mapmu   sync.RWMutex
+	connmu  sync.RWMutex
 )
 
 func saveMap(wsip uint64, conn *websocket.Conn, mt int) {
-	mapmu.Lock()
+	connmu.Lock()
 	connmap[wsip] = new(WSNode)
 	connmap[wsip].conn = conn
-	connmap[wsip].mt = mt
-	mapmu.Unlock()
+	connmu.Unlock()
+}
+
+func updateMt(wsip uint64, mt int) {
+	if wsip > 0 {
+		connmu.Lock()
+		connmap[wsip].mt = mt
+		connmu.Unlock()
+	}
 }

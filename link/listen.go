@@ -42,11 +42,16 @@ func listen(conn *websocket.Conn) {
 						h.Time = time.Now().UnixNano()
 						err = sendHello(ip.From, &h)
 						if err == nil {
+							if mywsip == 0 {
+								mywsip = ip.To
+								mymask = h.Mask
+							}
 							return
 						}
 					}
 				case ip64.NodesType:
 				}
+				updateMt(ip.From, mt)
 			}
 		}
 	}
@@ -61,7 +66,7 @@ func sendHello(wsip uint64, h *hello.Hello) error {
 		data, err := h.Marshal()
 		if err == nil {
 			var ip ip64.Ip64
-			ip.Pack(mywsip, wsip, 0, 0, data, uintptr(len(data)), ip64.HelloType)
+			ip.Pack(mywsip, wsip, 0, 0, &data, uintptr(len(data)), ip64.HelloType)
 			logrus.Info("[sendHello] send hello.")
 			err = ip.Send(wsn.conn, wsn.mt)
 		}
@@ -76,11 +81,11 @@ func sendHello(wsip uint64, h *hello.Hello) error {
 }
 
 // sendHelloUnknown 发送 hello 给未知 ip 方
-func sendHelloUnknown(conn *websocket.Conn, mt int, h *hello.Hello) error {
+func sendHelloUnknown(conn *websocket.Conn, mt int, h *hello.Hello, adviceip uint64) error {
 	data, err := h.Marshal()
 	if err == nil {
 		var ip ip64.Ip64
-		ip.Pack(mywsip, 0, 0, 0, data, uintptr(len(data)), ip64.HelloType)
+		ip.Pack(mywsip, adviceip, 0, 0, &data, uintptr(len(data)), ip64.HelloType)
 		logrus.Info("[sendHello] send hello.")
 		err = ip.Send(conn, mt)
 	}

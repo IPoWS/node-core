@@ -14,7 +14,7 @@ import (
 var (
 	npsurl string
 	mywsip uint64
-	mymask uint32
+	mymask uint64
 )
 
 // SetNPSUrl 设置NPS服务器地址
@@ -23,7 +23,7 @@ func SetNPSUrl(url string) {
 }
 
 // InitLink 初始化连接 返回 conn, messageType, delay, error
-func InitLink(url string) (conn *websocket.Conn, mt int, delay int64, err error) {
+func InitLink(url string, adviceip uint64) (conn *websocket.Conn, mt int, delay int64, err error) {
 	log.Printf("[initlink] connecting to %s", url)
 	conn, _, err = websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
@@ -33,7 +33,10 @@ func InitLink(url string) (conn *websocket.Conn, mt int, delay int64, err error)
 	t := time.Now().UnixNano()
 	h := myhello
 	h.Time = t
-	sendHelloUnknown(conn, mt, &h)
+	if adviceip > 0 {
+		h.Mask = 0xffff_ffff_0000_0000
+	}
+	sendHelloUnknown(conn, mt, &h, adviceip)
 	mt, p, err := conn.ReadMessage()
 	if err != nil {
 		log.Errorf("[initlink] %v", err)
