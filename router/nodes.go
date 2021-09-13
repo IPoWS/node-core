@@ -48,10 +48,10 @@ func DelNode(host string) {
 	Nodesmu.Unlock()
 }
 
-func SaveNodes(nodesfile string) {
-	Allnodes.Save(nodesfile)
+func SaveNodes(nodesfile string) error {
+	return Allnodes.Save(nodesfile)
 }
 
-func LoadNodes(nodesfile string) {
-	Allnodes.Load(nodesfile)
+func LoadNodes(nodesfile string) error {
+	return Allnodes.Load(nodesfile)
 }
