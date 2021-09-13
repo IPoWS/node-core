@@ -49,18 +49,21 @@ func StartCheck(m *nodes.Nodes) {
 		t2 := time.NewTicker(time.Millisecond * 655)
 		select {
 		case <-t.C:
-			logrus.Info("[checklick] send hello.")
 			for i := range m.CopyIp64S() {
 				SendHello(i)
 			}
+			logrus.Info("[checklink] send hello finished.")
+		}
+		select {
 		case <-t2.C:
-			logrus.Info("[checklick] check alive.")
 			now := uint64(time.Now().UnixNano())
 			for i, t := range m.CopyTimes() {
 				if now-t > 65536*1000000 {
 					DelConn(i)
 				}
 			}
+			logrus.Info("[checklink] check alive finished.")
+		default:
 		}
 	}()
 }
