@@ -45,6 +45,8 @@ func listen(conn *websocket.Conn) {
 							logrus.Infof("[listen] set my ip: %x with mask %x.", mywsip, mymask)
 						}
 						return
+					} else {
+						logrus.Error("[listen]", err)
 					}
 				case ip64.NodesType: // 在地址列表更新后
 					logrus.Info("[listen] recv nodes.")
