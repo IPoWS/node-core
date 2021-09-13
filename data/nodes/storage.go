@@ -32,12 +32,11 @@ func (m *Nodes) Load(nodesfile string) error {
 	Filemu.RLock()
 	data, err := os.ReadFile(nodesfile)
 	Filemu.RUnlock()
-	if err == nil {
+	if err == nil && data != nil && len(data) > 0 {
 		Memmu.Lock()
 		err = m.Unmarshal(data)
 		Memmu.Unlock()
-	} else if os.IsNotExist(err) {
-		err = nil
+	} else {
 		m.Hosts = make(map[string]uint64)
 		m.Ip64S = make(map[uint64]string)
 		m.Nodes = make(map[string]string)
