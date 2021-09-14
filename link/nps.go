@@ -9,8 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Register(ent string) {
-	conn, resp, err := websocket.DefaultDialer.Dial(npsurl+"?ent="+ent, nil)
+func Register(ent string, name string) {
+	conn, resp, err := websocket.DefaultDialer.Dial(npsurl+"?ent="+ent+"&name="+name, nil)
 	go listen(conn)
 	if err == nil {
 		data, err := io.ReadAll(resp.Body)
