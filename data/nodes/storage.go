@@ -3,6 +3,8 @@ package nodes
 import (
 	"os"
 	"sync"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Nodes struct {
@@ -33,6 +35,7 @@ func (m *Nodes) Load(nodesfile string) error {
 	m.FileMu.RLock()
 	data, err := os.ReadFile(nodesfile)
 	m.FileMu.RUnlock()
+	logrus.Infof("[nodes] load %d bytes from file.", len(data))
 	if err == nil && data != nil && len(data) > 0 {
 		m.MemMu.Lock()
 		err = m.Unmarshal(data)
@@ -49,6 +52,7 @@ func (m *Nodes) Clear() {
 	m.Nodes = make(map[string]string)
 	m.Delay = make(map[uint64]uint64)
 	m.Names = make(map[uint64]string)
+	logrus.Infoln("[nodes] clear node.")
 }
 
 func (m *Nodes) CopyNodes() map[string]string {
