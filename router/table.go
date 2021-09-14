@@ -22,7 +22,11 @@ func DelItem(to uint64) {
 
 func NextHop(to uint64) uint64 {
 	if to > 0 {
-		return table.nextHop(to).next
+		i := table.nextHop(to)
+		if i != nil {
+			return i.next
+		}
+		return to
 	}
 	return 0
 }

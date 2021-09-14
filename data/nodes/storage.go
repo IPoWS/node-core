@@ -48,7 +48,7 @@ func (m *Nodes) Clear() {
 	m.Ip64S = make(map[uint64]string)
 	m.Nodes = make(map[string]string)
 	m.Delay = make(map[uint64]uint64)
-	m.Hosts = make(map[string]uint64)
+	m.Names = make(map[uint64]string)
 }
 
 func (m *Nodes) CopyNodes() map[string]string {
