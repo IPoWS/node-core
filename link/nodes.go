@@ -38,7 +38,7 @@ func LoadNodes(nodesfile string) error {
 	return NodesList.Load(nodesfile)
 }
 
-func sendNewNodes() {
+func SendNewNodes(newnodes *nodes.Nodes) {
 	newnodes.MemMu.Lock()
 	data, err := newnodes.Marshal()
 	newnodes.Clear()
@@ -66,7 +66,7 @@ func startDeliverNewNodes() {
 				for _, ip := range n {
 					registerNode(ip)
 				}
-				sendNewNodes()
+				SendNewNodes(newnodes)
 			}
 		}
 	}()
