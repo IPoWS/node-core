@@ -20,7 +20,7 @@ func listen(conn *websocket.Conn) {
 			var ip ip64.Ip64
 			err := ip.Unmarshal(p)
 			if err == nil {
-				if ip.To == Mywsip {
+				if Mywsip == 0 || (Mywsip != 0 && ip.To == Mywsip) {
 					t := time.Now().UnixNano()
 					delay := t - ip.Time
 					if delay < int64(time.Second*6) && delay > 0 {
@@ -74,7 +74,7 @@ func listen(conn *websocket.Conn) {
 						logrus.Infof("[listen] delay of package from %x is invalid.", ip.From)
 					}
 				} else {
-					logrus.Info("[listen] forward pack from %x to %x.", ip.From, ip.To)
+					logrus.Infof("[listen] forward pack from %x to %x.", ip.From, ip.To)
 					Forward(router.NextHop(ip.To), &ip)
 				}
 			}
