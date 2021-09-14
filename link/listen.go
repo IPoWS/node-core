@@ -7,6 +7,7 @@ import (
 	"github.com/IPoWS/node-core/data/nodes"
 	"github.com/IPoWS/node-core/ip64"
 	"github.com/IPoWS/node-core/router"
+	"github.com/IPoWS/node-core/upper"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
@@ -20,11 +21,14 @@ func listen(conn *websocket.Conn) {
 			var ip ip64.Ip64
 			err := ip.Unmarshal(p)
 			if err == nil {
+				if ip.From > 0 {
+					SetAlive(ip.From)
+				}
 				if Mywsip == 0 || (Mywsip != 0 && ip.To == Mywsip) {
 					t := time.Now().UnixNano()
 					delay := t - ip.Time
 					if delay < int64(time.Second*6) && delay > 0 {
-						switch ip.Prototype {
+						switch ip.Prototype & 0x0000_ffff {
 						case ip64.HelloType:
 							var h hello.Hello
 							err = h.Unmarshal(ip.Data)
@@ -32,7 +36,6 @@ func listen(conn *websocket.Conn) {
 							if err == nil && ip.From > 0 && ip.To > 0 {
 								saveMap(ip.From, conn)
 								router.AddItem(ip.From, ip.From, uint16(delay/100000))
-								SetAlive(ip.From)
 								NodesList.AddNode(h.Host, h.Entry, ip.From, h.Name, uint64(delay))
 								registerNode(ip.From)
 							}
@@ -69,6 +72,9 @@ func listen(conn *websocket.Conn) {
 									}
 								}
 							}
+						case ip64.DataType:
+							port := (ip.Prototype & 0xffff_0000) >> 16
+							upper.Recv(uint16(port), &ip.Data)
 						}
 					} else {
 						logrus.Infof("[listen] delay of package from %x is invalid.", ip.From)

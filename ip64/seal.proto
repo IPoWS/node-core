@@ -2,6 +2,7 @@ syntax = "proto3";
 package ip64;
 
 message ip64 {
+    // 低4位数据包类型，高4位是端口号
     uint32 prototype = 1;
     // ip on ws using ipv6 addr fc00::add2::9a17::2333::host::addr::subn::addr
     uint64 from = 2;
