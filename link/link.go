@@ -15,7 +15,7 @@ func Send(to uint64, data *[]byte, prototype uint32) error {
 	if ok {
 		var ip ip64.Ip64
 		ip.Pack(Mywsip, to, data, prototype)
-		logrus.Info("[Send] link send %d bytes to %x.", len(*data), to)
+		logrus.Infof("[Send] link send %d bytes to %x.", len(*data), to)
 		return ip.Send(wsn, websocket.BinaryMessage)
 	}
 	return fmt.Errorf("dest %x unreachable.", to)
