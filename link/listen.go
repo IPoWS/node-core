@@ -33,6 +33,8 @@ func listen(conn *websocket.Conn) {
 								saveMap(ip.From, conn)
 								router.AddItem(ip.From, ip.From, uint16(delay/100000))
 								SetAlive(ip.From)
+								NodesList.AddNode(h.Host, h.Entry, ip.From, h.Name, uint64(delay))
+								registerNode(ip.From)
 							}
 							if err == nil {
 								if Mywsip == 0 {
@@ -50,17 +52,21 @@ func listen(conn *websocket.Conn) {
 							var newnodes nodes.Nodes
 							newnodes.Unmarshal(ip.Data)
 							for wsip, host := range newnodes.Ip64S {
-								ent := newnodes.Nodes[host]
-								alive := isLinkAlive(host, ent, wsip)
-								if alive {
-									NodesList.AddNode(host, ent, wsip, newnodes.Names[wsip], uint64(delay))
-									logrus.Infof("[listen] add node %x directly.", wsip)
-								}
-								relay := int64(newnodes.Delay[wsip]) + delay
-								if (alive && relay < int64(NodesList.Delay[wsip])) || (!alive && relay < int64(time.Second)) {
-									NodesList.AddNode(host, ent, wsip, newnodes.Names[wsip], uint64(relay))
-									router.AddItem(wsip, ip.From, uint16(relay/100000))
-									logrus.Infof("[listen] add node %x through %x, delay %d ms.", wsip, ip.From, relay/10)
+								if wsip == Mywsip {
+									myhello.Host = host
+								} else {
+									ent := newnodes.Nodes[host]
+									alive := isLinkAlive(host, ent, wsip)
+									if alive {
+										NodesList.AddNode(host, ent, wsip, newnodes.Names[wsip], uint64(delay))
+										logrus.Infof("[listen] add node %x directly.", wsip)
+									}
+									relay := int64(newnodes.Delay[wsip]) + delay
+									if (alive && relay < int64(NodesList.Delay[wsip])) || (!alive && relay < int64(time.Second)) {
+										NodesList.AddNode(host, ent, wsip, newnodes.Names[wsip], uint64(relay))
+										router.AddItem(wsip, ip.From, uint16(relay/100000))
+										logrus.Infof("[listen] add node %x through %x, delay %d ms.", wsip, ip.From, relay/10)
+									}
 								}
 							}
 						}

@@ -1,7 +1,6 @@
 package link
 
 import (
-	"sync"
 	"time"
 
 	"github.com/IPoWS/node-core/data/nodes"
@@ -15,7 +14,6 @@ var (
 	nfile     string
 	newnodes  *nodes.Nodes
 	nnt       = time.NewTicker(time.Minute)
-	nnmu      sync.Mutex
 )
 
 func init() {
