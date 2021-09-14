@@ -105,19 +105,6 @@ func (m *Nodes) AddNode(host string, ent string, ip uint64, name string, delay u
 	m.MemMu.Unlock()
 }
 
-func (m *Nodes) DelNodeByHost(host string) {
-	m.MemMu.Lock()
-	ip, ok := m.Hosts[host]
-	if ok {
-		delete(m.Nodes, host)
-		delete(m.Hosts, host)
-		delete(m.Ip64S, ip)
-		delete(m.Delay, ip)
-		delete(m.Names, ip)
-	}
-	m.MemMu.Unlock()
-}
-
 func (m *Nodes) DelNodeByIP(ip uint64) {
 	m.MemMu.Lock()
 	host, ok := m.Ip64S[ip]
