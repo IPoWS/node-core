@@ -128,5 +128,6 @@ func (m *Nodes) IsIp64InNodes(ip uint64) bool {
 func (m *Nodes) ParseRawNodes(d []byte) error {
 	defer m.MemMu.Unlock()
 	m.MemMu.Lock()
+	m.Clear()
 	return m.Unmarshal(d)
 }
