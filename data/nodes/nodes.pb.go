@@ -22,32 +22,34 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type Nodes struct {
+type NodesProto struct {
 	// real ip:port to entry
 	Nodes map[string]string `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// ip64 to real ip:port
 	Ip64S map[uint64]string `protobuf:"bytes,2,rep,name=ip64s,proto3" json:"ip64s,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// real ip:port to ip64
 	Hosts map[string]uint64 `protobuf:"bytes,3,rep,name=hosts,proto3" json:"hosts,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
-	// ip64 to last alive time
-	Times                map[uint64]uint64 `protobuf:"bytes,4,rep,name=times,proto3" json:"times,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
+	// ip64 to delay
+	Delay map[uint64]uint64 `protobuf:"bytes,4,rep,name=delay,proto3" json:"delay,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
+	// ip64 to host name
+	Names                map[uint64]string `protobuf:"bytes,5,rep,name=names,proto3" json:"names,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
 
-func (m *Nodes) Reset()         { *m = Nodes{} }
-func (m *Nodes) String() string { return proto.CompactTextString(m) }
-func (*Nodes) ProtoMessage()    {}
-func (*Nodes) Descriptor() ([]byte, []int) {
+func (m *NodesProto) Reset()         { *m = NodesProto{} }
+func (m *NodesProto) String() string { return proto.CompactTextString(m) }
+func (*NodesProto) ProtoMessage()    {}
+func (*NodesProto) Descriptor() ([]byte, []int) {
 	return fileDescriptor_39b18f0c01aa3995, []int{0}
 }
-func (m *Nodes) XXX_Unmarshal(b []byte) error {
+func (m *NodesProto) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Nodes) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *NodesProto) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Nodes.Marshal(b, m, deterministic)
+		return xxx_messageInfo_NodesProto.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -57,75 +59,85 @@ func (m *Nodes) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *Nodes) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Nodes.Merge(m, src)
+func (m *NodesProto) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_NodesProto.Merge(m, src)
 }
-func (m *Nodes) XXX_Size() int {
+func (m *NodesProto) XXX_Size() int {
 	return m.Size()
 }
-func (m *Nodes) XXX_DiscardUnknown() {
-	xxx_messageInfo_Nodes.DiscardUnknown(m)
+func (m *NodesProto) XXX_DiscardUnknown() {
+	xxx_messageInfo_NodesProto.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Nodes proto.InternalMessageInfo
+var xxx_messageInfo_NodesProto proto.InternalMessageInfo
 
-func (m *Nodes) GetNodes() map[string]string {
+func (m *NodesProto) GetNodes() map[string]string {
 	if m != nil {
 		return m.Nodes
 	}
 	return nil
 }
 
-func (m *Nodes) GetIp64S() map[uint64]string {
+func (m *NodesProto) GetIp64S() map[uint64]string {
 	if m != nil {
 		return m.Ip64S
 	}
 	return nil
 }
 
-func (m *Nodes) GetHosts() map[string]uint64 {
+func (m *NodesProto) GetHosts() map[string]uint64 {
 	if m != nil {
 		return m.Hosts
 	}
 	return nil
 }
 
-func (m *Nodes) GetTimes() map[uint64]uint64 {
+func (m *NodesProto) GetDelay() map[uint64]uint64 {
 	if m != nil {
-		return m.Times
+		return m.Delay
+	}
+	return nil
+}
+
+func (m *NodesProto) GetNames() map[uint64]string {
+	if m != nil {
+		return m.Names
 	}
 	return nil
 }
 
 func init() {
-	proto.RegisterType((*Nodes)(nil), "nodes.Nodes")
-	proto.RegisterMapType((map[string]uint64)(nil), "nodes.Nodes.HostsEntry")
-	proto.RegisterMapType((map[uint64]string)(nil), "nodes.Nodes.Ip64sEntry")
-	proto.RegisterMapType((map[string]string)(nil), "nodes.Nodes.NodesEntry")
-	proto.RegisterMapType((map[uint64]uint64)(nil), "nodes.Nodes.TimesEntry")
+	proto.RegisterType((*NodesProto)(nil), "nodes.NodesProto")
+	proto.RegisterMapType((map[uint64]uint64)(nil), "nodes.NodesProto.DelayEntry")
+	proto.RegisterMapType((map[string]uint64)(nil), "nodes.NodesProto.HostsEntry")
+	proto.RegisterMapType((map[uint64]string)(nil), "nodes.NodesProto.Ip64sEntry")
+	proto.RegisterMapType((map[uint64]string)(nil), "nodes.NodesProto.NamesEntry")
+	proto.RegisterMapType((map[string]string)(nil), "nodes.NodesProto.NodesEntry")
 }
 
 func init() { proto.RegisterFile("nodes.proto", fileDescriptor_39b18f0c01aa3995) }
 
 var fileDescriptor_39b18f0c01aa3995 = []byte{
-	// 219 bytes of a gzipped FileDescriptorProto
+	// 243 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0xce, 0xcb, 0x4f, 0x49,
-	0x2d, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x05, 0x73, 0x94, 0x56, 0x33, 0x73, 0xb1,
-	0xfa, 0x81, 0x58, 0x42, 0xba, 0x5c, 0x10, 0x21, 0x09, 0x46, 0x05, 0x66, 0x0d, 0x6e, 0x23, 0x71,
-	0x3d, 0x88, 0x6a, 0x3f, 0x04, 0xe9, 0x9a, 0x57, 0x52, 0x54, 0x19, 0x04, 0x51, 0x05, 0x52, 0x9e,
-	0x59, 0x60, 0x66, 0x52, 0x2c, 0xc1, 0x84, 0x45, 0xb9, 0x27, 0x48, 0x06, 0xaa, 0x1c, 0xac, 0x0a,
-	0xa4, 0x3c, 0x23, 0xbf, 0xb8, 0xa4, 0x58, 0x82, 0x19, 0x8b, 0x72, 0x0f, 0x90, 0x0c, 0x54, 0x39,
-	0x58, 0x15, 0x48, 0x79, 0x49, 0x66, 0x6e, 0x6a, 0xb1, 0x04, 0x0b, 0x16, 0xe5, 0x21, 0x20, 0x19,
-	0xa8, 0x72, 0xb0, 0x2a, 0x29, 0x0b, 0x2e, 0x2e, 0x84, 0x0b, 0x85, 0x04, 0xb8, 0x98, 0xb3, 0x53,
-	0x2b, 0x25, 0x18, 0x15, 0x18, 0x35, 0x38, 0x83, 0x40, 0x4c, 0x21, 0x11, 0x2e, 0xd6, 0xb2, 0xc4,
-	0x9c, 0xd2, 0x54, 0x09, 0x26, 0xb0, 0x18, 0x84, 0x63, 0xc5, 0x64, 0xc1, 0x08, 0xd2, 0x89, 0x70,
-	0x2c, 0xb2, 0x4e, 0x16, 0x22, 0x74, 0x22, 0xdc, 0x4d, 0xc8, 0x4e, 0x16, 0x34, 0x9d, 0x08, 0x2f,
-	0x10, 0xb2, 0x13, 0x59, 0xa7, 0x93, 0xc0, 0x89, 0x47, 0x72, 0x8c, 0x17, 0x1e, 0xc9, 0x31, 0x3e,
-	0x78, 0x24, 0xc7, 0x38, 0xe3, 0xb1, 0x1c, 0x43, 0x12, 0x1b, 0x38, 0x36, 0x8d, 0x01, 0x01, 0x00,
-	0x00, 0xff, 0xff, 0x91, 0xe0, 0x00, 0x0d, 0xdc, 0x01, 0x00, 0x00,
+	0x2d, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x05, 0x73, 0x94, 0x36, 0xb1, 0x70, 0x71,
+	0xf9, 0x81, 0x58, 0x01, 0x60, 0x51, 0x23, 0x2e, 0x88, 0xb8, 0x04, 0xa3, 0x02, 0xb3, 0x06, 0xb7,
+	0x91, 0x8c, 0x1e, 0x44, 0x0b, 0x42, 0x05, 0x84, 0xe9, 0x9a, 0x57, 0x52, 0x54, 0x19, 0x04, 0x51,
+	0x0a, 0xd2, 0x93, 0x59, 0x60, 0x66, 0x52, 0x2c, 0xc1, 0x84, 0x4b, 0x8f, 0x27, 0x48, 0x1a, 0xaa,
+	0x07, 0xac, 0x14, 0xa4, 0x27, 0x23, 0xbf, 0xb8, 0xa4, 0x58, 0x82, 0x19, 0x97, 0x1e, 0x0f, 0x90,
+	0x34, 0x54, 0x0f, 0x58, 0x29, 0x48, 0x4f, 0x4a, 0x6a, 0x4e, 0x62, 0xa5, 0x04, 0x0b, 0x2e, 0x3d,
+	0x2e, 0x20, 0x69, 0xa8, 0x1e, 0xb0, 0x52, 0xb0, 0x7f, 0x12, 0x73, 0x53, 0x8b, 0x25, 0x58, 0x71,
+	0xfa, 0x07, 0x24, 0x0d, 0xf3, 0x0f, 0x88, 0x2d, 0x65, 0x01, 0x0d, 0x11, 0xb0, 0xa0, 0x90, 0x00,
+	0x17, 0x73, 0x76, 0x6a, 0xa5, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10, 0x88, 0x29, 0x24, 0xc2,
+	0xc5, 0x5a, 0x96, 0x98, 0x53, 0x9a, 0x2a, 0xc1, 0x04, 0x16, 0x83, 0x70, 0xac, 0x98, 0x2c, 0x18,
+	0x41, 0x3a, 0x11, 0x5e, 0x45, 0xd6, 0xc9, 0x42, 0x84, 0x4e, 0x84, 0x87, 0x09, 0xd9, 0xc9, 0x82,
+	0xa6, 0x13, 0xe1, 0x6d, 0x42, 0x76, 0xa2, 0xeb, 0x44, 0x78, 0x9e, 0x14, 0xd7, 0x3a, 0x09, 0x9c,
+	0x78, 0x24, 0xc7, 0x78, 0xe1, 0x91, 0x1c, 0xe3, 0x83, 0x47, 0x72, 0x8c, 0x33, 0x1e, 0xcb, 0x31,
+	0x24, 0xb1, 0x81, 0x13, 0x95, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0xfe, 0x30, 0xfd, 0x09, 0x63,
+	0x02, 0x00, 0x00,
 }
 
-func (m *Nodes) Marshal() (dAtA []byte, err error) {
+func (m *NodesProto) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -135,12 +147,12 @@ func (m *Nodes) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Nodes) MarshalTo(dAtA []byte) (int, error) {
+func (m *NodesProto) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *Nodes) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *NodesProto) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -149,9 +161,26 @@ func (m *Nodes) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if len(m.Times) > 0 {
-		for k := range m.Times {
-			v := m.Times[k]
+	if len(m.Names) > 0 {
+		for k := range m.Names {
+			v := m.Names[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintNodes(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i = encodeVarintNodes(dAtA, i, uint64(k))
+			i--
+			dAtA[i] = 0x8
+			i = encodeVarintNodes(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if len(m.Delay) > 0 {
+		for k := range m.Delay {
+			v := m.Delay[k]
 			baseI := i
 			i = encodeVarintNodes(dAtA, i, uint64(v))
 			i--
@@ -231,7 +260,7 @@ func encodeVarintNodes(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *Nodes) Size() (n int) {
+func (m *NodesProto) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -261,11 +290,19 @@ func (m *Nodes) Size() (n int) {
 			n += mapEntrySize + 1 + sovNodes(uint64(mapEntrySize))
 		}
 	}
-	if len(m.Times) > 0 {
-		for k, v := range m.Times {
+	if len(m.Delay) > 0 {
+		for k, v := range m.Delay {
 			_ = k
 			_ = v
 			mapEntrySize := 1 + sovNodes(uint64(k)) + 1 + sovNodes(uint64(v))
+			n += mapEntrySize + 1 + sovNodes(uint64(mapEntrySize))
+		}
+	}
+	if len(m.Names) > 0 {
+		for k, v := range m.Names {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + sovNodes(uint64(k)) + 1 + len(v) + sovNodes(uint64(len(v)))
 			n += mapEntrySize + 1 + sovNodes(uint64(mapEntrySize))
 		}
 	}
@@ -281,7 +318,7 @@ func sovNodes(x uint64) (n int) {
 func sozNodes(x uint64) (n int) {
 	return sovNodes(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *Nodes) Unmarshal(dAtA []byte) error {
+func (m *NodesProto) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -304,10 +341,10 @@ func (m *Nodes) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Nodes: wiretype end group for non-group")
+			return fmt.Errorf("proto: NodesProto: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Nodes: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: NodesProto: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -665,7 +702,7 @@ func (m *Nodes) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Times", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Delay", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -692,8 +729,8 @@ func (m *Nodes) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Times == nil {
-				m.Times = make(map[uint64]uint64)
+			if m.Delay == nil {
+				m.Delay = make(map[uint64]uint64)
 			}
 			var mapkey uint64
 			var mapvalue uint64
@@ -760,7 +797,120 @@ func (m *Nodes) Unmarshal(dAtA []byte) error {
 					iNdEx += skippy
 				}
 			}
-			m.Times[mapkey] = mapvalue
+			m.Delay[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Names", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowNodes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthNodes
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthNodes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Names == nil {
+				m.Names = make(map[uint64]string)
+			}
+			var mapkey uint64
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowNodes
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowNodes
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowNodes
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthNodes
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthNodes
+					}
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipNodes(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthNodes
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Names[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

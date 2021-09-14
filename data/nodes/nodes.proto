@@ -1,13 +1,15 @@
 syntax = "proto3";
 package nodes;
 
-message Nodes {
+message NodesProto {
     // real ip:port to entry
     map<string, string> nodes = 1;
     // ip64 to real ip:port
     map<uint64, string> ip64s = 2;
     // real ip:port to ip64
     map<string, uint64> hosts = 3;
-    // ip64 to last alive time
-    map<uint64, uint64> times = 4;
+    // ip64 to delay
+    map<uint64, uint64> delay = 4;
+    // ip64 to host name
+    map<uint64, string> names = 5;
 }

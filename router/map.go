@@ -1,6 +1,8 @@
 package router
 
-import "sync"
+import (
+	"sync"
+)
 
 type transItem struct {
 	to      uint64
@@ -21,6 +23,19 @@ func (t *TransTable) init() {
 }
 
 func (t *TransTable) add(item *transItem) {
+	t.mu.RLock()
+	i, ok := t.table[item.to]
+	if ok {
+		if i.next != item.next {
+			if item.delayms >= i.delayms {
+				t.mu.RUnlock()
+				return
+			}
+		} else {
+			return
+		}
+	}
+	t.mu.RUnlock()
 	t.mu.Lock()
 	t.delays[item.delayms] = item
 	t.table[item.to] = item

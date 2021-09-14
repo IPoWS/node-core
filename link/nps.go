@@ -5,7 +5,6 @@ import (
 
 	"github.com/IPoWS/node-core/data/nodes"
 	"github.com/IPoWS/node-core/ip64"
-	"github.com/IPoWS/node-core/router"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
@@ -16,8 +15,8 @@ func Register(ent string) {
 	if err == nil {
 		data, err := io.ReadAll(resp.Body)
 		if err == nil {
-			router.ParseRawNodes(data)
-			StartCheck(router.Allnodes)
+			NodesList.ParseRawNodes(data)
+			startCheck(NodesList)
 		}
 	}
 	if err != nil {
@@ -32,7 +31,7 @@ func NotifyChange(n *nodes.Nodes) {
 		for to, wsn := range connmap {
 			if to > 0 && wsn != nil {
 				var ip ip64.Ip64
-				ip.Pack(mywsip, to, 0, 0, &data, ip64.NodesType)
+				ip.Pack(Mywsip, to, &data, ip64.NodesType)
 				ip.Send(wsn, websocket.BinaryMessage)
 			}
 		}

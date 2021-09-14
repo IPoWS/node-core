@@ -23,11 +23,11 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Hello struct {
-	// ack time
-	Time int64 `protobuf:"varint,1,opt,name=time,proto3" json:"time,omitempty"`
 	// ws path
-	Entry                string   `protobuf:"bytes,2,opt,name=entry,proto3" json:"entry,omitempty"`
-	Mask                 uint64   `protobuf:"varint,3,opt,name=mask,proto3" json:"mask,omitempty"`
+	Entry string `protobuf:"bytes,2,opt,name=entry,proto3" json:"entry,omitempty"`
+	Mask  uint64 `protobuf:"varint,3,opt,name=mask,proto3" json:"mask,omitempty"`
+	// host name
+	Name                 string   `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -66,13 +66,6 @@ func (m *Hello) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Hello proto.InternalMessageInfo
 
-func (m *Hello) GetTime() int64 {
-	if m != nil {
-		return m.Time
-	}
-	return 0
-}
-
 func (m *Hello) GetEntry() string {
 	if m != nil {
 		return m.Entry
@@ -87,6 +80,13 @@ func (m *Hello) GetMask() uint64 {
 	return 0
 }
 
+func (m *Hello) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*Hello)(nil), "hello.hello")
 }
@@ -94,15 +94,15 @@ func init() {
 func init() { proto.RegisterFile("hello.proto", fileDescriptor_61ef911816e0a8ce) }
 
 var fileDescriptor_61ef911816e0a8ce = []byte{
-	// 119 bytes of a gzipped FileDescriptorProto
+	// 116 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0xce, 0x48, 0xcd, 0xc9,
 	0xc9, 0xd7, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x05, 0x73, 0x94, 0x5c, 0xb9, 0x20, 0x0c,
-	0x21, 0x21, 0x2e, 0x96, 0x92, 0xcc, 0xdc, 0x54, 0x09, 0x46, 0x05, 0x46, 0x0d, 0xe6, 0x20, 0x30,
-	0x5b, 0x48, 0x84, 0x8b, 0x35, 0x35, 0xaf, 0xa4, 0xa8, 0x52, 0x82, 0x49, 0x81, 0x51, 0x83, 0x33,
-	0x08, 0xc2, 0x01, 0xa9, 0xcc, 0x4d, 0x2c, 0xce, 0x96, 0x60, 0x56, 0x60, 0xd4, 0x60, 0x09, 0x02,
-	0xb3, 0x9d, 0x04, 0x4e, 0x3c, 0x92, 0x63, 0xbc, 0xf0, 0x48, 0x8e, 0xf1, 0xc1, 0x23, 0x39, 0xc6,
-	0x19, 0x8f, 0xe5, 0x18, 0x92, 0xd8, 0xc0, 0xd6, 0x18, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0x9c,
-	0x79, 0x73, 0xd8, 0x75, 0x00, 0x00, 0x00,
+	0x21, 0x11, 0x2e, 0xd6, 0xd4, 0xbc, 0x92, 0xa2, 0x4a, 0x09, 0x26, 0x05, 0x46, 0x0d, 0xce, 0x20,
+	0x08, 0x47, 0x48, 0x88, 0x8b, 0x25, 0x37, 0xb1, 0x38, 0x5b, 0x82, 0x59, 0x81, 0x51, 0x83, 0x25,
+	0x08, 0xcc, 0x06, 0x89, 0xe5, 0x25, 0xe6, 0xa6, 0x4a, 0xb0, 0x80, 0x15, 0x82, 0xd9, 0x4e, 0x02,
+	0x27, 0x1e, 0xc9, 0x31, 0x5e, 0x78, 0x24, 0xc7, 0xf8, 0xe0, 0x91, 0x1c, 0xe3, 0x8c, 0xc7, 0x72,
+	0x0c, 0x49, 0x6c, 0x60, 0x6b, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x2c, 0x88, 0x6a, 0x74,
+	0x75, 0x00, 0x00, 0x00,
 }
 
 func (m *Hello) Marshal() (dAtA []byte, err error) {
@@ -129,6 +129,13 @@ func (m *Hello) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintHello(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x22
+	}
 	if m.Mask != 0 {
 		i = encodeVarintHello(dAtA, i, uint64(m.Mask))
 		i--
@@ -140,11 +147,6 @@ func (m *Hello) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintHello(dAtA, i, uint64(len(m.Entry)))
 		i--
 		dAtA[i] = 0x12
-	}
-	if m.Time != 0 {
-		i = encodeVarintHello(dAtA, i, uint64(m.Time))
-		i--
-		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -166,15 +168,16 @@ func (m *Hello) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Time != 0 {
-		n += 1 + sovHello(uint64(m.Time))
-	}
 	l = len(m.Entry)
 	if l > 0 {
 		n += 1 + l + sovHello(uint64(l))
 	}
 	if m.Mask != 0 {
 		n += 1 + sovHello(uint64(m.Mask))
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovHello(uint64(l))
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -217,25 +220,6 @@ func (m *Hello) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: hello: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Time", wireType)
-			}
-			m.Time = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHello
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Time |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Entry", wireType)
@@ -287,6 +271,38 @@ func (m *Hello) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowHello
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthHello
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthHello
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipHello(dAtA[iNdEx:])

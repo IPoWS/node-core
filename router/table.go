@@ -10,10 +10,7 @@ func init() {
 
 func AddItem(to uint64, next uint64, delayms uint16) {
 	if to > 0 && next > 0 {
-		nh := table.nextHop(to)
-		if (nh != nil && nh.delayms > delayms) || nh == nil {
-			table.add(&transItem{to, next, delayms})
-		}
+		table.add(&transItem{to, next, delayms})
 	}
 }
 

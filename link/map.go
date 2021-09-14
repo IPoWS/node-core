@@ -13,10 +13,16 @@ var (
 
 func saveMap(wsip uint64, conn *websocket.Conn) {
 	if wsip > 0 {
-		connmu.Lock()
-		connmap[wsip] = conn
-		connmu.Unlock()
+		connmu.RLock()
+		oldc := connmap[wsip]
+		connmu.RUnlock()
+		if oldc != conn {
+			connmu.Lock()
+			connmap[wsip] = conn
+			connmu.Unlock()
+		}
 	}
+
 }
 
 func delMap(wsip uint64) {

@@ -6,7 +6,8 @@ message ip64 {
     // ip on ws using ipv6 addr fc00::add2::9a17::2333::host::addr::subn::addr
     uint64 from = 2;
     uint64 to = 3;
-    // from+to ports
-    uint32 ports = 4;
-    bytes data = 5;
+    int32 ttl = 4;
+    // seal time unix nano
+    int64 time = 5;
+    bytes data = 6;
 }
