@@ -21,41 +21,51 @@ func listen(conn *websocket.Conn) {
 			err := ip.Unmarshal(p)
 			if err == nil {
 				if ip.To == Mywsip {
-					switch ip.Prototype {
-					case ip64.HelloType:
-						t := time.Now().UnixNano()
-						var h hello.Hello
-						err = h.Unmarshal(ip.Data)
-						delay := t - ip.Time
-						logrus.Infof("[listen] recv hello from: %x, to: %x, delay: %d ns.", ip.From, ip.To, delay)
-						if err == nil && delay > 0 && ip.From > 0 && ip.To > 0 {
-							saveMap(ip.From, conn)
-							router.AddItem(ip.From, ip.From, uint16(delay/10000))
-							SetAlive(ip.From)
-						}
-						if err == nil {
-							if Mywsip == 0 {
-								Mywsip = ip.To
-								myhello.Mask = h.Mask
-								logrus.Infof("[listen] set my ip: %x with mask %x.", Mywsip, h.Mask)
-								saveMap(Mywsip, conn)
+					t := time.Now().UnixNano()
+					delay := t - ip.Time
+					if delay < int64(time.Second*6) && delay > 0 {
+						switch ip.Prototype {
+						case ip64.HelloType:
+							var h hello.Hello
+							err = h.Unmarshal(ip.Data)
+							logrus.Infof("[listen] recv hello from: %x, to: %x, delay: %d ns.", ip.From, ip.To, delay)
+							if err == nil && ip.From > 0 && ip.To > 0 {
+								saveMap(ip.From, conn)
+								router.AddItem(ip.From, ip.From, uint16(delay/100000))
+								SetAlive(ip.From)
 							}
-							if Mywsip > 0 {
-								SendHello(Mywsip)
+							if err == nil {
+								if Mywsip == 0 {
+									Mywsip = ip.To
+									myhello.Mask = h.Mask
+									logrus.Infof("[listen] set my ip: %x with mask %x.", Mywsip, h.Mask)
+									saveMap(Mywsip, conn)
+								}
+								if Mywsip > 0 {
+									SendHello(Mywsip)
+								}
+							}
+						case ip64.NodesType: // 在地址列表更新后
+							logrus.Info("[listen] recv nodes.")
+							var newnodes nodes.Nodes
+							newnodes.Unmarshal(ip.Data)
+							for wsip, host := range newnodes.Ip64S {
+								ent := newnodes.Nodes[host]
+								alive := isLinkAlive(host, ent, wsip)
+								if alive {
+									NodesList.AddNode(host, ent, wsip, newnodes.Names[wsip], uint64(delay))
+									logrus.Infof("[listen] add node %x directly.", wsip)
+								}
+								relay := int64(newnodes.Delay[wsip]) + delay
+								if (alive && relay < int64(NodesList.Delay[wsip])) || (!alive && relay < int64(time.Second)) {
+									NodesList.AddNode(host, ent, wsip, newnodes.Names[wsip], uint64(relay))
+									router.AddItem(wsip, ip.From, uint16(relay/100000))
+									logrus.Infof("[listen] add node %x through %x, delay %d ms.", wsip, ip.From, relay/10)
+								}
 							}
 						}
-					case ip64.NodesType: // 在地址列表更新后
-						logrus.Info("[listen] recv nodes.")
-						var newnodes nodes.Nodes
-						newnodes.Unmarshal(ip.Data)
-						for wsip, host := range newnodes.Ip64S {
-							ent := newnodes.Nodes[host]
-							if isLinkAlive(host, ent, wsip) {
-								NodesList.AddNode(host, ent, wsip, newnodes.Names[wsip], uint64((ip.Time-time.Now().UnixNano())/10000))
-							} else {
-								router.AddItem(wsip, ip.From, uint16((int64(newnodes.Delay[wsip])+ip.Time-time.Now().UnixNano())/10000))
-							}
-						}
+					} else {
+						logrus.Infof("[listen] delay of package from %x is invalid.", ip.From)
 					}
 				} else {
 					logrus.Info("[listen] forward pack from %x to %x.", ip.From, ip.To)

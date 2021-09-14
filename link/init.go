@@ -51,7 +51,7 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 		return ip.From, delay, fmt.Errorf("peer %x reported a diff wsip than adv %x.", ip.From, adviceip)
 	}
 	saveMap(ip.From, conn)
-	router.AddItem(ip.From, ip.From, uint16(delay/10000))
+	router.AddItem(ip.From, ip.From, uint16(delay/100000))
 	log.Printf("[initlink] 链接测试成功，延时%vns，对方ip: %x", delay, ip.From)
 	return ip.From, delay, nil
 }

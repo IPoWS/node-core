@@ -6,6 +6,7 @@ import (
 
 	"github.com/IPoWS/node-core/data/nodes"
 	"github.com/IPoWS/node-core/ip64"
+	"github.com/IPoWS/node-core/router"
 	"github.com/sirupsen/logrus"
 )
 
@@ -50,23 +51,22 @@ func sendNewNodes() {
 	}
 }
 
-// RegisterNode 注册新的节点
-func RegisterNode(host string, ent string, ip uint64, name string, delay uint64) {
-	newnodes.AddNode(host, ent, ip, name, delay)
+// registerNode 注册新的节点
+func registerNode(ip uint64) {
+	host := NodesList.Ip64S[ip]
+	newnodes.AddNode(host, NodesList.Nodes[host], ip, NodesList.Names[ip], NodesList.Delay[ip])
+	logrus.Infof("[registerNode] %x.", ip)
 }
 
 func startDeliverNewNodes() {
 	go func() {
-		for {
-			select {
-			case <-nnt.C:
-				if len(newnodes.Names) > 0 {
-					sendNewNodes()
+		for range nnt.C {
+			n := router.NearMe()
+			if n != nil && len(n) > 0 {
+				for _, ip := range n {
+					registerNode(ip)
 				}
-			default:
-				if len(newnodes.Names) > 4 {
-					sendNewNodes()
-				}
+				sendNewNodes()
 			}
 		}
 	}()

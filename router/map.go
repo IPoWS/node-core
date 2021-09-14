@@ -5,15 +5,15 @@ import (
 )
 
 type transItem struct {
-	to      uint64
-	next    uint64
-	delayms uint16
+	to         uint64
+	next       uint64
+	delay100us uint16
 }
 
 type TransTable struct {
 	// to -> ti
 	table map[uint64]*transItem
-	// delay / 0.01ms -> ti
+	// delay / 100us -> ti
 	delays [65536]*transItem
 	mu     sync.RWMutex
 }
@@ -27,7 +27,7 @@ func (t *TransTable) add(item *transItem) {
 	i, ok := t.table[item.to]
 	if ok {
 		if i.next != item.next {
-			if item.delayms >= i.delayms {
+			if item.delay100us >= i.delay100us {
 				t.mu.RUnlock()
 				return
 			}
@@ -37,7 +37,7 @@ func (t *TransTable) add(item *transItem) {
 	}
 	t.mu.RUnlock()
 	t.mu.Lock()
-	t.delays[item.delayms] = item
+	t.delays[item.delay100us] = item
 	t.table[item.to] = item
 	t.mu.Unlock()
 }
@@ -47,7 +47,7 @@ func (t *TransTable) del(to uint64) {
 	i, ok := t.table[to]
 	if ok {
 		delete(t.table, to)
-		t.delays[i.delayms] = nil
+		t.delays[i.delay100us] = nil
 	}
 	t.mu.Unlock()
 }
@@ -65,4 +65,14 @@ func (t *TransTable) nextHop(to uint64) *transItem {
 		i <<= 1
 	}
 	return nil
+}
+
+func (t *TransTable) near() (r []uint64) {
+	for i := 0; i < 256; i++ {
+		i := t.delays[i]
+		if i != nil {
+			r = append(r, i.to)
+		}
+	}
+	return
 }

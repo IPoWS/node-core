@@ -8,9 +8,9 @@ func init() {
 	table.init()
 }
 
-func AddItem(to uint64, next uint64, delayms uint16) {
+func AddItem(to uint64, next uint64, delay100us uint16) {
 	if to > 0 && next > 0 {
-		table.add(&transItem{to, next, delayms})
+		table.add(&transItem{to, next, delay100us})
 	}
 }
 
@@ -25,4 +25,8 @@ func NextHop(to uint64) uint64 {
 		return table.nextHop(to).next
 	}
 	return 0
+}
+
+func NearMe() []uint64 {
+	return table.near()
 }
