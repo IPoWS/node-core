@@ -59,8 +59,6 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 		SetAlive(ip.From)
 		log.Printf("[initlink] 链接测试成功，延时%vns，对方ip: %x", delay, ip.From)
 		return ip.From, delay, nil
-	} else {
-		saveMap(ip.To, conn)
 	}
 	log.Printf("[initlink] 链接测试失败，延时%vns，对方ip: %x", delay, ip.From)
 	return ip.From, delay, fmt.Errorf("peer wsip is 0.")
