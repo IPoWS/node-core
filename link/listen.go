@@ -15,7 +15,7 @@ import (
 )
 
 // listen 监听其他节点发来的包
-func listen(conn *websocket.Conn, once bool) {
+func listen(conn *websocket.Conn) {
 	var err error
 	for err == nil {
 		_, p, err := conn.ReadMessage()
@@ -106,9 +106,6 @@ func listen(conn *websocket.Conn, once bool) {
 					Forward(router.NextHop(ip.To), &ip)
 				}
 			}
-		}
-		if once {
-			break
 		}
 	}
 	logrus.Errorf("[listen] %v", err)

@@ -14,7 +14,7 @@ func Register() error {
 	conn, resp, err := websocket.DefaultDialer.Dial(q, nil)
 	logrus.Info("[link.Register] register to ", q)
 	if err == nil {
-		go listen(conn, true)
+		go listen(conn)
 		data, err := io.ReadAll(resp.Body)
 		if err == nil {
 			NodesList.ParseRawNodes(data)
