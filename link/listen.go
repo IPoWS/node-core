@@ -55,7 +55,13 @@ func listen(conn *websocket.Conn) {
 										SendHello(Mywsip)
 									}
 								}
-								if ip.From > 0 && ip.To > 0 && Mywsip > 0 {
+								if ip.From == 0 {
+									ip.From = Mywsip
+								}
+								sendmu.RLock()
+								_, ok := sendmap[ip.From]
+								sendmu.RUnlock()
+								if !ok {
 									InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
 								}
 							} else {
@@ -128,9 +134,9 @@ func DelConn(wsip uint64) {
 
 // sendHello 发送 hello 给对方
 func sendHello(wsip uint64, h *hello.Hello) error {
-	connmu.RLock()
+	sendmu.RLock()
 	wsn, ok := sendmap[wsip]
-	connmu.RUnlock()
+	sendmu.RUnlock()
 	if ok {
 		data, err := h.Marshal()
 		if err == nil {

@@ -8,30 +8,42 @@ import (
 
 var (
 	sendmap = make(map[uint64]*websocket.Conn)
-	connmu  sync.RWMutex
+	sendmu  sync.RWMutex
 )
 
 func saveMap(wsip uint64, conn *websocket.Conn) {
 	if wsip > 0 {
-		connmu.RLock()
+		sendmu.RLock()
 		_, ok := sendmap[wsip]
-		connmu.RUnlock()
+		sendmu.RUnlock()
 		if !ok {
-			connmu.Lock()
+			sendmu.Lock()
 			sendmap[wsip] = conn
-			connmu.Unlock()
+			sendmu.Unlock()
 		}
 	}
 }
 
 func delMap(wsip uint64) {
+	sendmu.RLock()
 	conn, ok := sendmap[wsip]
+	sendmu.RUnlock()
 	if ok {
-		connmu.Lock()
+		sendmu.Lock()
 		delete(sendmap, wsip)
 		if conn != nil {
 			conn.Close()
 		}
-		connmu.Unlock()
+		sendmu.Unlock()
 	}
+}
+
+func copyMap() map[uint64]*websocket.Conn {
+	sendmu.RLock()
+	ret := make(map[uint64]*websocket.Conn, len(sendmap))
+	for k, v := range sendmap {
+		ret[k] = v
+	}
+	sendmu.RUnlock()
+	return ret
 }
