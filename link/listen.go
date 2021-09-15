@@ -21,7 +21,7 @@ func listen(conn *websocket.Conn) {
 		_, p, err := conn.ReadMessage()
 		if err == nil {
 			var ip ip64.Ip64
-			err := ip.Unmarshal(p)
+			err = ip.Unmarshal(p)
 			if err == nil {
 				if ip.From > 0 {
 					SetAlive(ip.From)
@@ -69,7 +69,6 @@ func listen(conn *websocket.Conn) {
 											logrus.Infof("[listen] start listening %s.", host)
 										} else {
 											logrus.Errorf("[listen] listen %s err: %v.", host, err)
-											err = nil
 										}
 									}
 								} else {
