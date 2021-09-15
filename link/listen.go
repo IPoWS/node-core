@@ -51,13 +51,11 @@ func listen(conn *websocket.Conn) {
 										NodesList.AddNode(h.Host, h.Entry, ip.To, h.Name, uint64(delay))
 										registerNode(ip.To)
 									}
-									if Mywsip > 0 {
-										SendHello(Mywsip)
-									}
 								}
 								if ip.From == 0 {
 									ip.From = Mywsip
 									InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
+									SendHello(Mywsip)
 								} else {
 									sendmu.RLock()
 									_, ok := sendmap[ip.From]
@@ -65,6 +63,7 @@ func listen(conn *websocket.Conn) {
 									if !ok {
 										InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
 									}
+									SendHello(ip.From)
 								}
 							} else {
 								logrus.Errorln("[listen] unmashal err: ", err)

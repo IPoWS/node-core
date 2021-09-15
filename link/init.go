@@ -14,9 +14,10 @@ import (
 )
 
 var (
-	npsurl  string
-	Mywsip  uint64
-	myhello hello.Hello
+	npsurl    string
+	Mywsip    uint64
+	myhello   hello.Hello
+	localhost *websocket.Conn
 )
 
 func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
