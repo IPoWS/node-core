@@ -9,8 +9,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Register(ent string, name string) error {
-	conn, resp, err := websocket.DefaultDialer.Dial(npsurl+"?ent="+ent+"&name="+name, nil)
+func Register() error {
+	q := npsurl + "?ent=" + myhello.Entry + "&name=" + myhello.Name
+	conn, resp, err := websocket.DefaultDialer.Dial(q, nil)
+	logrus.Info("[link.Register] register to ", q)
 	go listen(conn)
 	if err == nil {
 		data, err := io.ReadAll(resp.Body)
@@ -20,7 +22,7 @@ func Register(ent string, name string) error {
 		}
 	}
 	if err != nil {
-		logrus.Errorf("[RegisterAndGetNodes] %v", err)
+		logrus.Errorln("[link.Register] ", err)
 	}
 	return err
 }

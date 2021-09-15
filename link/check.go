@@ -27,7 +27,7 @@ func startCheck(m *nodes.Nodes) {
 	go func() {
 		n := m.CopyNodes()
 		for ip, host := range m.CopyIp64S() {
-			if !isLinkAlive(host, n[host], ip) {
+			if host != "" && !isLinkAlive(host, n[host], ip) {
 				NodesList.DelNodeByIP(ip)
 				logrus.Infof("[checklink] del %x -> %s.", ip, host)
 			}

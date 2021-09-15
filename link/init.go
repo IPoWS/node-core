@@ -9,6 +9,7 @@ import (
 	"github.com/IPoWS/node-core/ip64"
 	"github.com/IPoWS/node-core/router"
 	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -84,6 +85,7 @@ func InitEntry(nps string, ent string, hostname string, mask uint64) {
 		Name:  hostname,
 		Mask:  mask,
 	}
+	logrus.Infoln("[InitEntry] ", nps)
 	initEntry(ent)
 }
 
