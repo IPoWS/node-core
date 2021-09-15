@@ -1,6 +1,8 @@
 package link
 
 import (
+	"net"
+	"net/http"
 	"time"
 
 	"github.com/IPoWS/node-core/data/hello"
@@ -57,6 +59,14 @@ func listen(conn *websocket.Conn) {
 							for wsip, host := range newnodes.Ip64S {
 								if wsip == Mywsip {
 									myhello.Host = host
+									listener, err := net.Listen("tcp", host)
+									if err == nil {
+										go logrus.Fatal(http.Serve(listener, nil))
+										logrus.Infof("[listen] start listening %s.", host)
+									} else {
+										logrus.Infof("[listen] listen %s err: %v.", host, err)
+										err = nil
+									}
 								} else {
 									ent := newnodes.Nodes[host]
 									alive := isLinkAlive(host, ent, wsip)

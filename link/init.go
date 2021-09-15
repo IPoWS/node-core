@@ -80,6 +80,10 @@ func InitEntry(nps string, ent string, hostname string, mask uint64) {
 		Name:  hostname,
 		Mask:  mask,
 	}
+	initEntry(ent)
+}
+
+func initEntry(ent string) {
 	http.HandleFunc("/"+ent, func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err == nil {
