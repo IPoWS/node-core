@@ -46,7 +46,7 @@ func listen(conn *websocket.Conn) {
 										Mywsip = ip.To
 										myhello.Mask = h.Mask
 										logrus.Infof("[listen] set my ip: %x with mask %x.", Mywsip, h.Mask)
-										saveMap(Mywsip, conn)
+										// saveMap(Mywsip, conn)
 										router.AddItem(ip.To, ip.To, uint16(delay/100000))
 										NodesList.AddNode(h.Host, h.Entry, ip.To, h.Name, uint64(delay))
 										registerNode(ip.To)
@@ -57,12 +57,14 @@ func listen(conn *websocket.Conn) {
 								}
 								if ip.From == 0 {
 									ip.From = Mywsip
-								}
-								sendmu.RLock()
-								_, ok := sendmap[ip.From]
-								sendmu.RUnlock()
-								if !ok {
 									InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
+								} else {
+									sendmu.RLock()
+									_, ok := sendmap[ip.From]
+									sendmu.RUnlock()
+									if !ok {
+										InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
+									}
 								}
 							} else {
 								logrus.Errorln("[listen] unmashal err: ", err)
