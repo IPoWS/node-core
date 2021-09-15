@@ -57,7 +57,7 @@ func listen(conn *websocket.Conn) {
 									sendmap[Mywsip] = sendmap[0]
 									sendmu.Unlock()
 									SendHello(Mywsip) // send to me
-									InitLink("ws://"+conn.LocalAddr().String()+"/"+h.Entry, Mywsip)
+									InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, Mywsip)
 								} else {
 									sendmu.RLock()
 									_, ok := sendmap[ip.From]
