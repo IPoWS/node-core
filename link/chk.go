@@ -15,11 +15,17 @@ func SetAlive(ip uint64) {
 }
 
 func isLinkAlive(host string, ent string, ip uint64) bool {
-	wsip, _, err := InitLink("ws://"+host+"/"+ent, ip)
-	if err != nil || (ip != 0 && wsip != ip) {
-		return false
+	now := uint64(time.Now().UnixNano())
+	t, ok := lastalive[ip]
+	if ok {
+		return now-t <= 65536*1000000
+	} else {
+		wsip, _, err := InitLink("ws://"+host+"/"+ent, ip)
+		if err != nil || (ip != 0 && wsip != ip) {
+			return false
+		}
+		return true
 	}
-	return true
 }
 
 func startCheck() {

@@ -18,7 +18,8 @@ import (
 func listen(conn *websocket.Conn) {
 	var err error
 	for err == nil {
-		_, p, err := conn.ReadMessage()
+		var p []byte
+		_, p, err = conn.ReadMessage()
 		if err == nil {
 			var ip ip64.Ip64
 			err = ip.Unmarshal(p)
