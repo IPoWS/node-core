@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
 )
 
 func (ip *Ip64) Send(conn *websocket.Conn, mt int) error {
@@ -14,6 +15,9 @@ func (ip *Ip64) Send(conn *websocket.Conn, mt int) error {
 	d, err := ip.Marshal()
 	if err == nil {
 		err = conn.WriteMessage(mt, d)
+	}
+	if err != nil {
+		logrus.Errorln("[ip64] send err: ", err)
 	}
 	return err
 }
