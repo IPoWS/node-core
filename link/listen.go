@@ -37,7 +37,7 @@ func listen(conn *websocket.Conn) {
 							logrus.Infof("[listen] recv hello from: %x, to: %x, delay: %d ns.", ip.From, ip.To, delay)
 							if err == nil {
 								if ip.From > 0 && ip.To > 0 && Mywsip > 0 {
-									saveMap(ip.From, conn)
+									// saveMap(ip.From, conn)
 									router.AddItem(ip.From, ip.From, uint16(delay/100000))
 									NodesList.AddNode(h.Host, h.Entry, ip.From, h.Name, uint64(delay))
 									registerNode(ip.From)
@@ -46,7 +46,7 @@ func listen(conn *websocket.Conn) {
 										Mywsip = ip.To
 										myhello.Mask = h.Mask
 										logrus.Infof("[listen] set my ip: %x with mask %x.", Mywsip, h.Mask)
-										saveMap(Mywsip, conn)
+										// saveMap(Mywsip, conn)
 										router.AddItem(ip.To, ip.To, uint16(delay/100000))
 										NodesList.AddNode(h.Host, h.Entry, ip.To, h.Name, uint64(delay))
 										registerNode(ip.To)
@@ -126,7 +126,7 @@ func DelConn(wsip uint64) {
 // sendHello 发送 hello 给对方
 func sendHello(wsip uint64, h *hello.Hello) error {
 	connmu.RLock()
-	wsn, ok := connmap[wsip]
+	wsn, ok := sendmap[wsip]
 	connmu.RUnlock()
 	if ok {
 		data, err := h.Marshal()

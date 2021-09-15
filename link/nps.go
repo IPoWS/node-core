@@ -31,7 +31,7 @@ func Register() error {
 func NotifyChange(n *nodes.Nodes) {
 	data, err := n.Marshal()
 	if err == nil {
-		for to, wsn := range connmap {
+		for to, wsn := range sendmap {
 			if to > 0 && wsn != nil {
 				var ip ip64.Ip64
 				ip.Pack(Mywsip, to, &data, ip64.NodesType)

@@ -10,7 +10,7 @@ import (
 
 func Send(to uint64, data *[]byte, prototype uint32, port uint16) error {
 	connmu.RLock()
-	wsn, ok := connmap[to]
+	wsn, ok := sendmap[to]
 	connmu.RUnlock()
 	if ok {
 		var ip ip64.Ip64
@@ -23,7 +23,7 @@ func Send(to uint64, data *[]byte, prototype uint32, port uint16) error {
 
 func Forward(to uint64, ip *ip64.Ip64) error {
 	connmu.RLock()
-	wsn, ok := connmap[to]
+	wsn, ok := sendmap[to]
 	connmu.RUnlock()
 	if ok {
 		return ip.Send(wsn, websocket.BinaryMessage)
