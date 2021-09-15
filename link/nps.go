@@ -13,16 +13,21 @@ func Register() error {
 	q := npsurl + "?ent=" + myhello.Entry + "&name=" + myhello.Name
 	conn, resp, err := websocket.DefaultDialer.Dial(q, nil)
 	logrus.Info("[link.Register] register to ", q)
-	go listen(conn)
 	if err == nil {
-		data, err := io.ReadAll(resp.Body)
+		_, _, err = initLink(conn, 0)
 		if err == nil {
-			NodesList.ParseRawNodes(data)
-			startCheck()
+			data, err := io.ReadAll(resp.Body)
+			if err == nil {
+				NodesList.ParseRawNodes(data)
+				startCheck()
+			} else {
+				logrus.Errorln("[link.Register] read body: ", err)
+			}
+		} else {
+			logrus.Errorln("[link.Register] init link: ", err)
 		}
-	}
-	if err != nil {
-		logrus.Errorln("[link.Register] ", err)
+	} else {
+		logrus.Errorln("[link.Register] dial: ", err)
 	}
 	return err
 }
