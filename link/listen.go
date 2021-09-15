@@ -61,14 +61,17 @@ func listen(conn *websocket.Conn) {
 							newnodes.Unmarshal(ip.Data)
 							for wsip, host := range newnodes.Ip64S {
 								if wsip == Mywsip {
-									myhello.Host = host
-									listener, err := net.Listen("tcp", host)
-									if err == nil {
-										go logrus.Fatal(http.Serve(listener, nil))
-										logrus.Infof("[listen] start listening %s.", host)
-									} else {
-										logrus.Infof("[listen] listen %s err: %v.", host, err)
-										err = nil
+									logrus.Infoln("[listen] check own node ip.")
+									if myhello.Host == "" {
+										myhello.Host = host
+										listener, err := net.Listen("tcp", host)
+										if err == nil {
+											go logrus.Fatal(http.Serve(listener, nil))
+											logrus.Infof("[listen] start listening %s.", host)
+										} else {
+											logrus.Infof("[listen] listen %s err: %v.", host, err)
+											err = nil
+										}
 									}
 								} else {
 									ent := newnodes.Nodes[host]
