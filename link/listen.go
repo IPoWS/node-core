@@ -100,9 +100,6 @@ func listen(conn *websocket.Conn) {
 					Forward(router.NextHop(ip.To), &ip)
 				}
 			}
-		} else {
-			logrus.Errorf("[listen] %v", err)
-			err = nil
 		}
 	}
 	logrus.Errorf("[listen] %v", err)
