@@ -20,7 +20,9 @@ func saveMap(wsip uint64, conn *websocket.Conn) {
 			connmu.Lock()
 			connmap[wsip] = conn
 			connmu.Unlock()
-			oldc.Close()
+			if oldc != nil {
+				oldc.Close()
+			}
 		}
 	}
 }
