@@ -14,24 +14,24 @@ var (
 func saveMap(wsip uint64, conn *websocket.Conn) {
 	if wsip > 0 {
 		connmu.RLock()
-		oldc := connmap[wsip]
+		_, ok := connmap[wsip]
 		connmu.RUnlock()
-		if oldc != conn {
+		if !ok {
 			connmu.Lock()
 			connmap[wsip] = conn
 			connmu.Unlock()
-			if oldc != nil {
-				oldc.Close()
-			}
 		}
 	}
 }
 
 func delMap(wsip uint64) {
-	_, ok := connmap[wsip]
+	conn, ok := connmap[wsip]
 	if ok {
 		connmu.Lock()
 		delete(connmap, wsip)
+		if conn != nil {
+			conn.Close()
+		}
 		connmu.Unlock()
 	}
 }

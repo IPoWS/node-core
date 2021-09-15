@@ -40,8 +40,7 @@ func listen(conn *websocket.Conn) {
 								router.AddItem(ip.From, ip.From, uint16(delay/100000))
 								NodesList.AddNode(h.Host, h.Entry, ip.From, h.Name, uint64(delay))
 								registerNode(ip.From)
-							}
-							if err == nil {
+							} else if err == nil {
 								if Mywsip == 0 {
 									Mywsip = ip.To
 									myhello.Mask = h.Mask
@@ -69,7 +68,7 @@ func listen(conn *websocket.Conn) {
 											go logrus.Fatal(http.Serve(listener, nil))
 											logrus.Infof("[listen] start listening %s.", host)
 										} else {
-											logrus.Infof("[listen] listen %s err: %v.", host, err)
+											logrus.Errorf("[listen] listen %s err: %v.", host, err)
 											err = nil
 										}
 									}
@@ -130,7 +129,7 @@ func sendHello(wsip uint64, h *hello.Hello) error {
 		if err == nil {
 			var ip ip64.Ip64
 			ip.Pack(Mywsip, wsip, &data, ip64.HelloType)
-			logrus.Info("[sendHello] send hello to %x.", wsip)
+			logrus.Infof("[sendHello] send hello to %x.", wsip)
 			err = ip.Send(wsn, websocket.BinaryMessage)
 		}
 		if err != nil {
