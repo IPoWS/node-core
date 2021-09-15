@@ -34,7 +34,7 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 	var ip ip64.Ip64
 	err = ip.Unmarshal(p)
 	if err != nil {
-		log.Errorf("[initlink] parse ip63 err: %v", err)
+		log.Errorf("[initlink] parse ip64 err: %v", err)
 		return ip.From, 0, err
 	}
 	err = h.Unmarshal(ip.Data)

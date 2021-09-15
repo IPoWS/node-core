@@ -18,7 +18,7 @@ func Register() error {
 		data, err := io.ReadAll(resp.Body)
 		if err == nil {
 			NodesList.ParseRawNodes(data)
-			startCheck(NodesList)
+			startCheck()
 		}
 	}
 	if err != nil {

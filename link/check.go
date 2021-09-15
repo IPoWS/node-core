@@ -3,7 +3,6 @@ package link
 import (
 	"time"
 
-	"github.com/IPoWS/node-core/data/nodes"
 	"github.com/sirupsen/logrus"
 )
 
@@ -23,10 +22,10 @@ func isLinkAlive(host string, ent string, ip uint64) bool {
 	return true
 }
 
-func startCheck(m *nodes.Nodes) {
+func startCheck() {
 	go func() {
-		n := m.CopyNodes()
-		for ip, host := range m.CopyIp64S() {
+		n := NodesList.CopyNodes()
+		for ip, host := range NodesList.CopyIp64S() {
 			if host != "" && !isLinkAlive(host, n[host], ip) {
 				NodesList.DelNodeByIP(ip)
 				logrus.Infof("[checklink] del %x -> %s.", ip, host)
@@ -35,7 +34,7 @@ func startCheck(m *nodes.Nodes) {
 		SaveNodesBack()
 		t := time.NewTicker(time.Millisecond * 32768)
 		for range t.C {
-			for i := range m.CopyIp64S() {
+			for i := range NodesList.CopyIp64S() {
 				SendHello(i)
 				time.Sleep(time.Millisecond * 10)
 			}
