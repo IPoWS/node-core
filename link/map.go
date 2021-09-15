@@ -11,21 +11,28 @@ var (
 	sendmu  sync.RWMutex
 )
 
-func saveMap(wsip uint64, conn *websocket.Conn) {
+func isInMap(wsip uint64) bool {
 	sendmu.RLock()
 	_, ok := sendmap[wsip]
 	sendmu.RUnlock()
-	if !ok {
-		sendmu.Lock()
-		sendmap[wsip] = conn
-		sendmu.Unlock()
-	}
+	return ok
+}
+
+func readMap(wsip uint64) (conn *websocket.Conn, ok bool) {
+	sendmu.RLock()
+	conn, ok = sendmap[wsip]
+	sendmu.RUnlock()
+	return
+}
+
+func saveMap(wsip uint64, conn *websocket.Conn) {
+	sendmu.Lock()
+	sendmap[wsip] = conn
+	sendmu.Unlock()
 }
 
 func delMap(wsip uint64) {
-	sendmu.RLock()
-	conn, ok := sendmap[wsip]
-	sendmu.RUnlock()
+	conn, ok := readMap(wsip)
 	if ok {
 		sendmu.Lock()
 		delete(sendmap, wsip)

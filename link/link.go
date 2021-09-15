@@ -9,9 +9,7 @@ import (
 )
 
 func Send(to uint64, data *[]byte, prototype uint32, port uint16) error {
-	sendmu.RLock()
-	wsn, ok := sendmap[to]
-	sendmu.RUnlock()
+	wsn, ok := readMap(to)
 	if ok {
 		var ip ip64.Ip64
 		ip.Pack(Mywsip, to, data, prototype|(uint32(port)<<16))
@@ -22,9 +20,7 @@ func Send(to uint64, data *[]byte, prototype uint32, port uint16) error {
 }
 
 func Forward(to uint64, ip *ip64.Ip64) error {
-	sendmu.RLock()
-	wsn, ok := sendmap[to]
-	sendmu.RUnlock()
+	wsn, ok := readMap(to)
 	if ok {
 		return ip.Send(wsn, websocket.BinaryMessage)
 	}

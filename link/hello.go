@@ -15,9 +15,7 @@ func SendHello(to uint64) error {
 
 // sendHello 发送 hello 给对方
 func sendHello(wsip uint64, h *hello.Hello) error {
-	sendmu.RLock()
-	wsn, ok := sendmap[wsip]
-	sendmu.RUnlock()
+	wsn, ok := readMap(wsip)
 	if ok {
 		data, err := h.Marshal()
 		if err == nil {
