@@ -12,15 +12,13 @@ var (
 )
 
 func saveMap(wsip uint64, conn *websocket.Conn) {
-	if wsip > 0 {
-		sendmu.RLock()
-		_, ok := sendmap[wsip]
-		sendmu.RUnlock()
-		if !ok {
-			sendmu.Lock()
-			sendmap[wsip] = conn
-			sendmu.Unlock()
-		}
+	sendmu.RLock()
+	_, ok := sendmap[wsip]
+	sendmu.RUnlock()
+	if !ok {
+		sendmu.Lock()
+		sendmap[wsip] = conn
+		sendmu.Unlock()
 	}
 }
 
