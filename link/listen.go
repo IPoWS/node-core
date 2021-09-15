@@ -133,7 +133,7 @@ func sendHello(wsip uint64, h *hello.Hello) error {
 		if err == nil {
 			var ip ip64.Ip64
 			ip.Pack(Mywsip, wsip, &data, ip64.HelloType)
-			logrus.Info("[sendHello] send hello.")
+			logrus.Info("[sendHello] send hello to %x.", wsip)
 			err = ip.Send(wsn, websocket.BinaryMessage)
 		}
 		if err != nil {

@@ -50,13 +50,17 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 		log.Infof("[initlink] peer %x reported a diff wsip than adv %x.", ip.From, adviceip)
 		return ip.From, delay, fmt.Errorf("peer %x reported a diff wsip than adv %x.", ip.From, adviceip)
 	}
-	saveMap(ip.From, conn)
-	router.AddItem(ip.From, ip.From, uint16(delay/100000))
-	NodesList.AddNode(h.Host, h.Entry, ip.From, h.Name, uint64(delay))
-	registerNode(ip.From)
-	SetAlive(ip.From)
-	log.Printf("[initlink] 链接测试成功，延时%vns，对方ip: %x", delay, ip.From)
-	return ip.From, delay, nil
+	if ip.From > 0 {
+		saveMap(ip.From, conn)
+		router.AddItem(ip.From, ip.From, uint16(delay/100000))
+		NodesList.AddNode(h.Host, h.Entry, ip.From, h.Name, uint64(delay))
+		registerNode(ip.From)
+		SetAlive(ip.From)
+		log.Printf("[initlink] 链接测试成功，延时%vns，对方ip: %x", delay, ip.From)
+		return ip.From, delay, nil
+	}
+	log.Printf("[initlink] 链接测试失败，延时%vns，对方ip: %x", delay, ip.From)
+	return ip.From, delay, fmt.Errorf("peer wsip is 0.")
 }
 
 // InitLink 初始化连接 返回 wsip delay error, url 必须以 ws:// 开头, 以 ent 结尾, adviceip 可为 0

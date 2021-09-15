@@ -96,6 +96,7 @@ func (m *Nodes) CopyDelay() map[uint64]uint64 {
 }
 
 func (m *Nodes) AddNode(host string, ent string, ip uint64, name string, delay uint64) {
+	logrus.Debugln("[nodes] add node ", host, ent, ip, name, delay)
 	m.MemMu.Lock()
 	m.Nodes[host] = ent
 	m.Ip64S[ip] = host

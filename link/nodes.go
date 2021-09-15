@@ -44,7 +44,6 @@ func SendNewNodes(newnodes *nodes.Nodes) {
 	if err == nil {
 		for i := range NodesList.CopyIp64S() {
 			Send(i, &data, ip64.NodesType, 0)
-			logrus.Infof("[link] send new node info %x.", i)
 		}
 	}
 }
