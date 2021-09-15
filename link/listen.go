@@ -15,7 +15,7 @@ import (
 )
 
 // listen 监听其他节点发来的包
-func listen(conn *websocket.Conn) {
+func listen(conn *websocket.Conn, once bool) {
 	var err error
 	for err == nil {
 		_, p, err := conn.ReadMessage()
@@ -46,7 +46,7 @@ func listen(conn *websocket.Conn) {
 										Mywsip = ip.To
 										myhello.Mask = h.Mask
 										logrus.Infof("[listen] set my ip: %x with mask %x.", Mywsip, h.Mask)
-										// saveMap(Mywsip, conn)
+										saveMap(Mywsip, conn)
 										router.AddItem(ip.To, ip.To, uint16(delay/100000))
 										NodesList.AddNode(h.Host, h.Entry, ip.To, h.Name, uint64(delay))
 										registerNode(ip.To)
@@ -54,6 +54,9 @@ func listen(conn *websocket.Conn) {
 									if Mywsip > 0 {
 										SendHello(Mywsip)
 									}
+								}
+								if ip.From > 0 && ip.To > 0 && Mywsip > 0 {
+									InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
 								}
 							} else {
 								logrus.Errorln("[listen] unmashal err: ", err)
@@ -103,6 +106,9 @@ func listen(conn *websocket.Conn) {
 					Forward(router.NextHop(ip.To), &ip)
 				}
 			}
+		}
+		if once {
+			break
 		}
 	}
 	logrus.Errorf("[listen] %v", err)

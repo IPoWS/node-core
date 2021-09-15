@@ -14,17 +14,13 @@ func Register() error {
 	conn, resp, err := websocket.DefaultDialer.Dial(q, nil)
 	logrus.Info("[link.Register] register to ", q)
 	if err == nil {
-		_, _, err = initLink(conn, 0)
+		go listen(conn, true)
+		data, err := io.ReadAll(resp.Body)
 		if err == nil {
-			data, err := io.ReadAll(resp.Body)
-			if err == nil {
-				NodesList.ParseRawNodes(data)
-				startCheck()
-			} else {
-				logrus.Errorln("[link.Register] read body: ", err)
-			}
+			NodesList.ParseRawNodes(data)
+			startCheck()
 		} else {
-			logrus.Errorln("[link.Register] init link: ", err)
+			logrus.Errorln("[link.Register] read body: ", err)
 		}
 	} else {
 		logrus.Errorln("[link.Register] dial: ", err)

@@ -52,7 +52,9 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 		return ip.From, delay, fmt.Errorf("peer %x reported a diff wsip than adv %x.", ip.From, adviceip)
 	}
 	if ip.From > 0 {
-		saveMap(ip.From, conn)
+		if ip.From != Mywsip {
+			saveMap(ip.From, conn)
+		}
 		router.AddItem(ip.From, ip.From, uint16(delay/100000))
 		NodesList.AddNode(h.Host, h.Entry, ip.From, h.Name, uint64(delay))
 		registerNode(ip.From)
@@ -93,7 +95,7 @@ func initEntry(ent string) {
 	http.HandleFunc("/"+ent, func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err == nil {
-			go listen(conn)
+			go listen(conn, false)
 		}
 	})
 }
