@@ -47,6 +47,9 @@ func listen(conn *websocket.Conn) {
 									myhello.Mask = h.Mask
 									logrus.Infof("[listen] set my ip: %x with mask %x.", Mywsip, h.Mask)
 									saveMap(Mywsip, conn)
+									router.AddItem(ip.To, ip.To, uint16(delay/100000))
+									NodesList.AddNode(h.Host, h.Entry, ip.To, h.Name, uint64(delay))
+									registerNode(ip.To)
 								}
 								if Mywsip > 0 {
 									SendHello(Mywsip)
