@@ -22,6 +22,7 @@ var (
 func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 	t := time.Now().UnixNano()
 	h := myhello
+	h.Isinit = true
 	if adviceip > 0 {
 		h.Mask = 0xffff_ffff_0000_0000
 	}
