@@ -54,7 +54,7 @@ func listen(conn *websocket.Conn) {
 								}
 								if ip.From == 0 {
 									ip.From = Mywsip
-									InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
+									InitLink("ws://"+conn.LocalAddr().String()+"/"+h.Entry, ip.From)
 									SendHello(Mywsip)
 								} else {
 									sendmu.RLock()
