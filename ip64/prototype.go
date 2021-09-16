@@ -1,7 +1,7 @@
 package ip64
 
 const (
-	HelloType uint32 = iota
+	HelloType uint16 = iota
 	NodesType
 	DataType
 )

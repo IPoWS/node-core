@@ -36,7 +36,7 @@ func NotifyChange(n *nodes.Nodes) {
 		for to, wsn := range copyMap() {
 			if to > 0 && wsn != nil {
 				var ip ip64.Ip64
-				ip.Pack(Mywsip, to, &data, ip64.NodesType)
+				ip.Pack(Mywsip, to, &data, ip64.NodesType, 0, 0)
 				ip.Send(wsn, websocket.BinaryMessage)
 			}
 		}

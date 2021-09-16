@@ -2,12 +2,13 @@ syntax = "proto3";
 package ip64;
 
 message ip64 {
-    // 低4位数据包类型，高4位是端口号
-    uint32 prototype = 1;
+    // 低4字节数据包类型，高4字节是目的端口号
+    uint32 destproto = 1;
     // ip on ws using ipv6 addr fc00::add2::9a17::2333::host::addr::subn::addr
     uint64 from = 2;
     uint64 to = 3;
-    int32 ttl = 4;
+    // 低4字节ttl，高4字节源端口号
+    int32 srcttl = 4;
     // seal time unix nano
     int64 time = 5;
     bytes data = 6;

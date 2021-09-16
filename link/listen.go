@@ -29,7 +29,7 @@ func listen(conn *websocket.Conn) {
 					t := time.Now().UnixNano()
 					delay := t - ip.Time
 					if delay < int64(time.Second*6) && delay > 0 {
-						switch ip.Prototype & 0x0000_ffff {
+						switch uint16(ip.Destproto & 0x0000_ffff) {
 						case ip64.HelloType:
 							var h hello.Hello
 							err = h.Unmarshal(ip.Data)
@@ -91,8 +91,9 @@ func listen(conn *websocket.Conn) {
 								}
 							}
 						case ip64.DataType:
-							port := (ip.Prototype & 0xffff_0000) >> 16
-							upper.Recv(uint16(port), &ip.Data)
+							destport := uint16((ip.Destproto & 0xffff_0000) >> 16)
+							srcport := uint16((uint32(ip.Srcttl) & 0xffff_0000) >> 16)
+							upper.Recv(srcport, destport, &ip.Data)
 						}
 					} else {
 						logrus.Infof("[listen] delay of package from %x is invalid.", ip.From)

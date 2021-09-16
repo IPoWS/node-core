@@ -8,9 +8,10 @@ import (
 )
 
 func (ip *Ip64) Send(conn *websocket.Conn, mt int) error {
-	ip.Ttl -= 1
-	if ip.Ttl <= 0 {
-		return fmt.Errorf("[ip64] send to %x failed: ttl = %d.", ip.To, ip.Ttl)
+	ttl := ip.Srcttl & 0x0000_ffff
+	ttl -= 1
+	if ttl <= 0 {
+		return fmt.Errorf("[ip64] send to %x failed: ttl = %d.", ip.To, ttl)
 	}
 	d, err := ip.Marshal()
 	if err == nil {

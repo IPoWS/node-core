@@ -1,18 +1,18 @@
 package upper
 
 type Service interface {
-	Handle(data *[]byte)
+	Handle(srcport uint16, destport uint16, data *[]byte)
 }
 
 var (
 	handlers = make(map[uint16]*Service)
 )
 
-func Recv(port uint16, data *[]byte) {
-	if port > 0 {
-		h, ok := handlers[port]
+func Recv(srcport uint16, destport uint16, data *[]byte) {
+	if destport > 0 {
+		h, ok := handlers[destport]
 		if ok {
-			(*h).Handle(data)
+			(*h).Handle(srcport, destport, data)
 		}
 	}
 }

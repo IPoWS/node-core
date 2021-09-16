@@ -8,11 +8,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Send(to uint64, data *[]byte, prototype uint32, port uint16) error {
+func Send(to uint64, data *[]byte, proto uint16, srcport uint16, destport uint16) error {
 	wsn, ok := readMap(to)
 	if ok {
 		var ip ip64.Ip64
-		ip.Pack(Mywsip, to, data, prototype|(uint32(port)<<16))
+		ip.Pack(Mywsip, to, data, proto, srcport, destport)
 		logrus.Infof("[Send] link send %d bytes to %x.", len(*data), to)
 		return ip.Send(wsn, websocket.BinaryMessage)
 	}

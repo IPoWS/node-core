@@ -23,11 +23,13 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Ip64 struct {
-	Prototype uint32 `protobuf:"varint,1,opt,name=prototype,proto3" json:"prototype,omitempty"`
+	// 低4字节数据包类型，高4字节是目的端口号
+	Destproto uint32 `protobuf:"varint,1,opt,name=destproto,proto3" json:"destproto,omitempty"`
 	// ip on ws using ipv6 addr fc00::add2::9a17::2333::host::addr::subn::addr
 	From uint64 `protobuf:"varint,2,opt,name=from,proto3" json:"from,omitempty"`
 	To   uint64 `protobuf:"varint,3,opt,name=to,proto3" json:"to,omitempty"`
-	Ttl  int32  `protobuf:"varint,4,opt,name=ttl,proto3" json:"ttl,omitempty"`
+	// 低4字节ttl，高4字节源端口号
+	Srcttl int32 `protobuf:"varint,4,opt,name=srcttl,proto3" json:"srcttl,omitempty"`
 	// seal time unix nano
 	Time                 int64    `protobuf:"varint,5,opt,name=time,proto3" json:"time,omitempty"`
 	Data                 []byte   `protobuf:"bytes,6,opt,name=data,proto3" json:"data,omitempty"`
@@ -69,9 +71,9 @@ func (m *Ip64) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Ip64 proto.InternalMessageInfo
 
-func (m *Ip64) GetPrototype() uint32 {
+func (m *Ip64) GetDestproto() uint32 {
 	if m != nil {
-		return m.Prototype
+		return m.Destproto
 	}
 	return 0
 }
@@ -90,9 +92,9 @@ func (m *Ip64) GetTo() uint64 {
 	return 0
 }
 
-func (m *Ip64) GetTtl() int32 {
+func (m *Ip64) GetSrcttl() int32 {
 	if m != nil {
-		return m.Ttl
+		return m.Srcttl
 	}
 	return 0
 }
@@ -118,18 +120,18 @@ func init() {
 func init() { proto.RegisterFile("seal.proto", fileDescriptor_a02c8d155741ea4f) }
 
 var fileDescriptor_a02c8d155741ea4f = []byte{
-	// 165 bytes of a gzipped FileDescriptorProto
+	// 168 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2a, 0x4e, 0x4d, 0xcc,
-	0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0xc9, 0x2c, 0x30, 0x33, 0x51, 0x6a, 0x62, 0xe4,
-	0x02, 0x33, 0x84, 0x64, 0xb8, 0x38, 0xc1, 0xe2, 0x25, 0x95, 0x05, 0xa9, 0x12, 0x8c, 0x0a, 0x8c,
+	0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0xc9, 0x2c, 0x30, 0x33, 0x51, 0xea, 0x60, 0xe4,
+	0x02, 0x33, 0x84, 0x64, 0xb8, 0x38, 0x53, 0x52, 0x8b, 0x4b, 0xc0, 0x72, 0x12, 0x8c, 0x0a, 0x8c,
 	0x1a, 0xbc, 0x41, 0x08, 0x01, 0x21, 0x21, 0x2e, 0x96, 0xb4, 0xa2, 0xfc, 0x5c, 0x09, 0x26, 0x05,
 	0x46, 0x0d, 0x96, 0x20, 0x30, 0x5b, 0x88, 0x8f, 0x8b, 0xa9, 0x24, 0x5f, 0x82, 0x19, 0x2c, 0xc2,
-	0x54, 0x92, 0x2f, 0x24, 0xc0, 0xc5, 0x5c, 0x52, 0x92, 0x23, 0xc1, 0xa2, 0xc0, 0xa8, 0xc1, 0x1a,
-	0x04, 0x62, 0x82, 0x74, 0x95, 0x64, 0xe6, 0xa6, 0x4a, 0xb0, 0x2a, 0x30, 0x6a, 0x30, 0x07, 0x81,
-	0xd9, 0x20, 0xb1, 0x94, 0xc4, 0x92, 0x44, 0x09, 0x36, 0x05, 0x46, 0x0d, 0x9e, 0x20, 0x30, 0xdb,
-	0x49, 0xe0, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f, 0x3c, 0x92, 0x63, 0x9c, 0xf1,
-	0x58, 0x8e, 0x21, 0x89, 0x0d, 0x6c, 0xb5, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x04, 0x0c, 0xd8,
-	0xcd, 0xb1, 0x00, 0x00, 0x00,
+	0x54, 0x92, 0x2f, 0x24, 0xc6, 0xc5, 0x56, 0x5c, 0x94, 0x5c, 0x52, 0x92, 0x23, 0xc1, 0xa2, 0xc0,
+	0xa8, 0xc1, 0x1a, 0x04, 0xe5, 0x81, 0xf4, 0x96, 0x64, 0xe6, 0xa6, 0x4a, 0xb0, 0x2a, 0x30, 0x6a,
+	0x30, 0x07, 0x81, 0xd9, 0x20, 0xb1, 0x94, 0xc4, 0x92, 0x44, 0x09, 0x36, 0x05, 0x46, 0x0d, 0x9e,
+	0x20, 0x30, 0xdb, 0x49, 0xe0, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f, 0x3c, 0x92,
+	0x63, 0x9c, 0xf1, 0x58, 0x8e, 0x21, 0x89, 0x0d, 0x6c, 0xb9, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff,
+	0x62, 0xde, 0xfc, 0xa1, 0xb7, 0x00, 0x00, 0x00,
 }
 
 func (m *Ip64) Marshal() (dAtA []byte, err error) {
@@ -168,8 +170,8 @@ func (m *Ip64) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x28
 	}
-	if m.Ttl != 0 {
-		i = encodeVarintSeal(dAtA, i, uint64(m.Ttl))
+	if m.Srcttl != 0 {
+		i = encodeVarintSeal(dAtA, i, uint64(m.Srcttl))
 		i--
 		dAtA[i] = 0x20
 	}
@@ -183,8 +185,8 @@ func (m *Ip64) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x10
 	}
-	if m.Prototype != 0 {
-		i = encodeVarintSeal(dAtA, i, uint64(m.Prototype))
+	if m.Destproto != 0 {
+		i = encodeVarintSeal(dAtA, i, uint64(m.Destproto))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -208,8 +210,8 @@ func (m *Ip64) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Prototype != 0 {
-		n += 1 + sovSeal(uint64(m.Prototype))
+	if m.Destproto != 0 {
+		n += 1 + sovSeal(uint64(m.Destproto))
 	}
 	if m.From != 0 {
 		n += 1 + sovSeal(uint64(m.From))
@@ -217,8 +219,8 @@ func (m *Ip64) Size() (n int) {
 	if m.To != 0 {
 		n += 1 + sovSeal(uint64(m.To))
 	}
-	if m.Ttl != 0 {
-		n += 1 + sovSeal(uint64(m.Ttl))
+	if m.Srcttl != 0 {
+		n += 1 + sovSeal(uint64(m.Srcttl))
 	}
 	if m.Time != 0 {
 		n += 1 + sovSeal(uint64(m.Time))
@@ -270,9 +272,9 @@ func (m *Ip64) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Prototype", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Destproto", wireType)
 			}
-			m.Prototype = 0
+			m.Destproto = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowSeal
@@ -282,7 +284,7 @@ func (m *Ip64) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Prototype |= uint32(b&0x7F) << shift
+				m.Destproto |= uint32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -327,9 +329,9 @@ func (m *Ip64) Unmarshal(dAtA []byte) error {
 			}
 		case 4:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Ttl", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Srcttl", wireType)
 			}
-			m.Ttl = 0
+			m.Srcttl = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowSeal
@@ -339,7 +341,7 @@ func (m *Ip64) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Ttl |= int32(b&0x7F) << shift
+				m.Srcttl |= int32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

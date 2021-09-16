@@ -43,7 +43,7 @@ func SendNewNodes(newnodes *nodes.Nodes) {
 	newnodes.MemMu.Unlock()
 	if err == nil {
 		for i := range NodesList.CopyIp64S() {
-			Send(i, &data, ip64.NodesType, 0)
+			Send(i, &data, ip64.NodesType, 0, 0)
 		}
 	}
 }
