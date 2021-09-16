@@ -60,10 +60,13 @@ func listen(conn *websocket.Conn) {
 										}
 									}
 									if ip.From != 0 {
+										sendmu.Lock()
+										sendmap[ip.From] = conn
+										sendmu.Unlock()
+										SendHello(ip.From)
 										if !isInMap(ip.From) {
 											InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
 										}
-										SendHello(ip.From)
 									}
 								}
 							} else {
