@@ -16,6 +16,7 @@ import (
 func listen(p []byte, conn *websocket.Conn) {
 	var ip ip64.Ip64
 	err := ip.Unmarshal(p)
+	sendhellobackto := ip.From
 	if err == nil {
 		if ip.From > 0 {
 			SetAlive(ip.From)
@@ -45,7 +46,7 @@ func listen(p []byte, conn *websocket.Conn) {
 									sendmu.Lock()
 									sendmap[Mywsip] = conn
 									sendmu.Unlock()
-									SendHello(Mywsip) // send to me
+									sendhellobackto = Mywsip
 								}
 							}
 							if ip.From != 0 { // 是其它node建立的链接，建立一条反向链接以send
@@ -53,7 +54,6 @@ func listen(p []byte, conn *websocket.Conn) {
 								_, ok := sendmap[ip.From]
 								sendmap[ip.From] = conn
 								sendmu.Unlock()
-								SendHello(ip.From)
 								if !ok {
 									InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
 								}
@@ -63,12 +63,10 @@ func listen(p []byte, conn *websocket.Conn) {
 							router.AddItem(ip.From, ip.From, uint16(delay/100000))
 							NodesList.AddNode(conn.RemoteAddr().String(), h.Entry, ip.From, h.Name, uint64(delay))
 							registerNode(ip.From)
-							SendHello(ip.From)
 						}
 					} else {
 						logrus.Errorln("[listen.hello] unmashal err: ", err)
 						err = nil
-						SendHello(ip.From)
 					}
 				case ip64.NodesType: // 在地址列表更新后
 					logrus.Info("[listen.nodes] recv nodes.")
@@ -90,13 +88,11 @@ func listen(p []byte, conn *websocket.Conn) {
 							}
 						}
 					}
-					SendHello(ip.From)
 				case ip64.DataType:
 					destport := uint16((ip.Destproto & 0xffff_0000) >> 16)
 					srcport := uint16((uint32(ip.Srcttl) & 0xffff_0000) >> 16)
 					logrus.Infof("[listen.data] recv data from port %d to %d.", srcport, destport)
 					upper.Recv(srcport, destport, &ip.Data)
-					SendHello(ip.From)
 				}
 			} else {
 				logrus.Infof("[listen] delay of package from %x is invalid.", ip.From)
@@ -105,5 +101,6 @@ func listen(p []byte, conn *websocket.Conn) {
 			logrus.Infof("[listen] forward pack from %x to %x.", ip.From, ip.To)
 			Forward(router.NextHop(ip.To), &ip)
 		}
+		SendHello(sendhellobackto)
 	}
 }
