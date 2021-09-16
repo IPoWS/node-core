@@ -14,8 +14,10 @@ import (
 
 // listen 监听其他节点发来的包
 func listen(conn *websocket.Conn) {
+	logrus.Infof("[listen] wait for msg.")
 	_, p, err := conn.ReadMessage()
-	if err != nil {
+	logrus.Infof("[listen] msg arrived.")
+	if err == nil {
 		var ip ip64.Ip64
 		err = ip.Unmarshal(p)
 		sendhellobackto := ip.From

@@ -88,7 +88,7 @@ func InitEntry(nps string, ent string, hostname string, mask uint64) {
 		Name:  hostname,
 		Mask:  mask,
 	}
-	logrus.Infof("[InitEntry] nps: %s ent: %s name: %s mask: %x.", nps, ent, hostname, mask)
+	logrus.Infof("[InitEntry] nps: %s, ent: %s, name: %s, mask: %x.", nps, ent, hostname, mask)
 	initEntry(ent)
 }
 
@@ -105,6 +105,7 @@ func initEntry(ent string) {
 func UpgradeLink(w http.ResponseWriter, r *http.Request, adviceip uint64) (uint64, int64, error) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err == nil {
+		logrus.Infof("[link.init] upgrade link for %x.", adviceip)
 		return initLink(conn, adviceip)
 	}
 	return 0, 0, err
