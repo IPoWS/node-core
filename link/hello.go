@@ -16,7 +16,7 @@ func SendHello(to uint64) ([]byte, error) {
 }
 
 // sendHello 发送 hello 给对方
-func sendHello(wsip uint64, h *hello.Hello, handler func([]byte, *websocket.Conn)) ([]byte, error) {
+func sendHello(wsip uint64, h *hello.Hello, handler func(*websocket.Conn)) ([]byte, error) {
 	wsn, ok := readMap(wsip)
 	if ok {
 		data, err := h.Marshal()

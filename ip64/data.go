@@ -8,7 +8,7 @@ import (
 )
 
 // Send 发送 ip 包，如处理函数为空则直接返回数据
-func (ip *Ip64) Send(conn *websocket.Conn, mt int, handleretdat func(data []byte, conn *websocket.Conn)) ([]byte, error) {
+func (ip *Ip64) Send(conn *websocket.Conn, mt int, nextHandler func(conn *websocket.Conn)) ([]byte, error) {
 	ttl := ip.Srcttl & 0x0000_ffff
 	ttl -= 1
 	if ttl <= 0 {
@@ -18,13 +18,13 @@ func (ip *Ip64) Send(conn *websocket.Conn, mt int, handleretdat func(data []byte
 	if err == nil {
 		err = conn.WriteMessage(mt, d)
 	}
-	if err == nil {
+	if err == nil && nextHandler == nil {
 		_, d, err = conn.ReadMessage()
 	}
 	if err != nil {
 		logrus.Errorln("[ip64] send err: ", err)
-	} else if handleretdat != nil {
-		handleretdat(d, conn)
+	} else if nextHandler != nil {
+		nextHandler(conn)
 	}
 	return d, err
 }
