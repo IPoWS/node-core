@@ -25,6 +25,7 @@ func listen(conn *websocket.Conn) {
 				if ip.From > 0 {
 					SetAlive(ip.From)
 				}
+				logrus.Infof("[listen] recv from: %x, to: %x.", ip.From, ip.To)
 				if Mywsip == 0 || (Mywsip != 0 && ip.To == Mywsip) {
 					t := time.Now().UnixNano()
 					delay := t - ip.Time
@@ -33,7 +34,7 @@ func listen(conn *websocket.Conn) {
 						case ip64.HelloType:
 							var h hello.Hello
 							err = h.Unmarshal(ip.Data)
-							logrus.Infof("[listen.hello] recv from: %x, to: %x, delay: %d ns.", ip.From, ip.To, delay)
+							logrus.Infof("[listen.hello] delay: %d ns.", delay)
 							if err == nil {
 								if ip.From > 0 && ip.To > 0 && Mywsip > 0 {
 									// saveMap(ip.From, conn)
@@ -58,10 +59,12 @@ func listen(conn *websocket.Conn) {
 											SendHello(Mywsip) // send to me
 										}
 									}
-									if !isInMap(ip.From) {
-										InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
+									if ip.From != 0 {
+										if !isInMap(ip.From) {
+											InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
+										}
+										SendHello(ip.From)
 									}
-									SendHello(ip.From)
 								}
 							} else {
 								logrus.Errorln("[listen.hello] unmashal err: ", err)
