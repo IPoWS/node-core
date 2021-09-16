@@ -58,7 +58,7 @@ func listen(conn *websocket.Conn) {
 										sendmap[Mywsip] = sendmap[0]
 										sendmu.Unlock()
 										SendHello(Mywsip) // send to me
-										InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, Mywsip)
+										// InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, Mywsip)
 									} else {
 										if !isInMap(ip.From) {
 											InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
