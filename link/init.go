@@ -60,7 +60,6 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 		router.AddItem(ip.From, ip.From, uint16(delay/100000))
 		NodesList.AddNode(conn.RemoteAddr().String(), h.Entry, ip.From, h.Name, uint64(delay))
 		registerNode(ip.From)
-		SetAlive(ip.From)
 		log.Printf("[initlink] 链接测试成功，延时%vns，对方ip: %x", delay, ip.From)
 		return ip.From, delay, nil
 	}

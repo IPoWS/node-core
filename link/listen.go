@@ -18,9 +18,6 @@ func listen(p []byte, conn *websocket.Conn) {
 	err := ip.Unmarshal(p)
 	sendhellobackto := ip.From
 	if err == nil {
-		if ip.From > 0 {
-			SetAlive(ip.From)
-		}
 		logrus.Infof("[listen] recv from: %x, to: %x.", ip.From, ip.To)
 		if Mywsip == 0 || (Mywsip != 0 && ip.To == Mywsip) {
 			t := time.Now().UnixNano()
