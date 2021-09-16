@@ -40,7 +40,9 @@ func listen(conn *websocket.Conn) {
 									router.AddItem(ip.From, ip.From, uint16(delay/100000))
 									NodesList.AddNode(conn.RemoteAddr().String(), h.Entry, ip.From, h.Name, uint64(delay))
 									registerNode(ip.From)
-								} else {
+								}
+								if h.Isinit {
+									logrus.Infoln("[listen.hello] recv init.")
 									if Mywsip == 0 {
 										Mywsip = ip.To
 										myhello.Mask = h.Mask
@@ -49,22 +51,17 @@ func listen(conn *websocket.Conn) {
 										router.AddItem(ip.To, ip.To, uint16(delay/100000))
 										NodesList.AddNode(conn.RemoteAddr().String(), h.Entry, ip.To, h.Name, uint64(delay))
 										registerNode(ip.To)
-									}
-								}
-								if h.Isinit {
-									logrus.Infoln("[listen.hello] recv init.")
-									if ip.From == 0 {
-										sendmu.Lock()
-										sendmap[Mywsip] = sendmap[0]
-										sendmu.Unlock()
-										SendHello(Mywsip) // send to me
-										// InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, Mywsip)
-									} else {
-										if !isInMap(ip.From) {
-											InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
+										if ip.From == 0 { // 自分配ip，是nps
+											sendmu.Lock()
+											sendmap[Mywsip] = sendmap[0]
+											sendmu.Unlock()
+											SendHello(Mywsip) // send to me
 										}
-										SendHello(ip.From)
 									}
+									if !isInMap(ip.From) {
+										InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
+									}
+									SendHello(ip.From)
 								}
 							} else {
 								logrus.Errorln("[listen.hello] unmashal err: ", err)

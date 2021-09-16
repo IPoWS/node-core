@@ -67,7 +67,7 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 
 // InitLink 初始化连接 返回 wsip delay error, url 必须以 ws:// 开头, 以 ent 结尾, adviceip 可为 0
 func InitLink(url string, adviceip uint64) (uint64, int64, error) {
-	log.Printf("[initlink] connecting to %s", url)
+	log.Printf("[initlink] connecting to %s, adv ip %x", url, adviceip)
 	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		log.Errorf("[initlink] %v", err)
