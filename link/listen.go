@@ -36,12 +36,6 @@ func listen(conn *websocket.Conn) {
 							err = h.Unmarshal(ip.Data)
 							logrus.Infof("[listen.hello] delay: %d ns.", delay)
 							if err == nil {
-								if ip.From > 0 && ip.To > 0 && Mywsip > 0 {
-									// saveMap(ip.From, conn)
-									router.AddItem(ip.From, ip.From, uint16(delay/100000))
-									NodesList.AddNode(conn.RemoteAddr().String(), h.Entry, ip.From, h.Name, uint64(delay))
-									registerNode(ip.From)
-								}
 								if h.Isinit {
 									logrus.Infoln("[listen.hello] recv init.")
 									if Mywsip == 0 {
@@ -59,7 +53,7 @@ func listen(conn *websocket.Conn) {
 											SendHello(Mywsip) // send to me
 										}
 									}
-									if ip.From != 0 {
+									if ip.From != 0 { // 是其它node建立的链接，建立一条反向链接以send
 										sendmu.Lock()
 										_, ok := sendmap[ip.From]
 										sendmap[ip.From] = conn
@@ -69,6 +63,11 @@ func listen(conn *websocket.Conn) {
 											InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
 										}
 									}
+								} else if ip.From > 0 && ip.To > 0 && Mywsip > 0 {
+									// saveMap(ip.From, conn)
+									router.AddItem(ip.From, ip.From, uint16(delay/100000))
+									NodesList.AddNode(conn.RemoteAddr().String(), h.Entry, ip.From, h.Name, uint64(delay))
+									registerNode(ip.From)
 								}
 							} else {
 								logrus.Errorln("[listen.hello] unmashal err: ", err)

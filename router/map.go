@@ -68,7 +68,7 @@ func (t *TransTable) nextHop(to uint64) *transItem {
 }
 
 func (t *TransTable) near() (r []uint64) {
-	for i := 0; i < 256; i++ {
+	for i := 0; i < 8192; i++ {
 		i := t.delays[i]
 		if i != nil {
 			r = append(r, i.to)
