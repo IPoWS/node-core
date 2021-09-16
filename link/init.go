@@ -88,7 +88,7 @@ func InitEntry(nps string, ent string, hostname string, mask uint64) {
 		Name:  hostname,
 		Mask:  mask,
 	}
-	logrus.Infoln("[InitEntry] ", nps)
+	logrus.Infof("[InitEntry] nps: %s ent: %s name: %s mask: %x.", nps, ent, hostname, mask)
 	initEntry(ent)
 }
 

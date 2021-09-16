@@ -100,7 +100,7 @@ func listen(conn *websocket.Conn) {
 				logrus.Infof("[listen] forward pack from %x to %x.", ip.From, ip.To)
 				Forward(router.NextHop(ip.To), &ip)
 			}
-			SendHello(sendhellobackto)
+			SendHello(sendhellobackto, conn)
 		}
 	}
 }
