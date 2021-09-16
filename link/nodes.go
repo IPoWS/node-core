@@ -48,7 +48,7 @@ func SendNewNodes(newnodes *nodes.Nodes) {
 	}
 }
 
-// registerNode 注册新的节点
+// registerNode 注册新的节点到newnodes以便广播
 func registerNode(ip uint64) {
 	host := NodesList.Ip64S[ip]
 	newnodes.AddNode(host, NodesList.Nodes[host], ip, NodesList.Names[ip], NodesList.Delay[ip])

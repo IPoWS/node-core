@@ -40,19 +40,16 @@ func startCheck() {
 		SaveNodesBack()
 		t := time.NewTicker(time.Millisecond * 32768)
 		for range t.C {
+			logrus.Info("[checklink] send hello started.")
 			for i := range NodesList.CopyIp64S() {
-				SendHello(i)
-				time.Sleep(time.Millisecond * 10)
-			}
-			logrus.Info("[checklink] send hello finished.")
-			time.Sleep(time.Millisecond * 8192)
-			now := uint64(time.Now().UnixNano())
-			for i, t := range lastalive {
-				if now-t > 65536*1000000 {
+				err := SendHello(i)
+				if err != nil {
 					DelConn(i)
+				} else {
+					SetAlive(i)
 				}
 			}
-			logrus.Info("[checklink] check alive finished.")
+			logrus.Info("[checklink] send hello finished.")
 		}
 	}()
 }
