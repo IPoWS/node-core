@@ -2,12 +2,11 @@ syntax = "proto3";
 package hello;
 
 message hello {
-    string host = 1;
+    // if isinit is set, listen will ret another hello
+    bool isinit = 1;
     // ws path
     string entry = 2;
     uint64 mask = 3;
     // host name
     string name = 4;
-    // if isinit is set, listen will ret another hello
-    bool isinit = 5;
 }

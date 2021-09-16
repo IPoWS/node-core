@@ -23,14 +23,13 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Hello struct {
-	Host string `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`
+	// if isinit is set, listen will ret another hello
+	Isinit bool `protobuf:"varint,1,opt,name=isinit,proto3" json:"isinit,omitempty"`
 	// ws path
 	Entry string `protobuf:"bytes,2,opt,name=entry,proto3" json:"entry,omitempty"`
 	Mask  uint64 `protobuf:"varint,3,opt,name=mask,proto3" json:"mask,omitempty"`
 	// host name
-	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	// if isinit is set, listen will ret another hello
-	Isinit               bool     `protobuf:"varint,5,opt,name=isinit,proto3" json:"isinit,omitempty"`
+	Name                 string   `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -69,11 +68,11 @@ func (m *Hello) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Hello proto.InternalMessageInfo
 
-func (m *Hello) GetHost() string {
+func (m *Hello) GetIsinit() bool {
 	if m != nil {
-		return m.Host
+		return m.Isinit
 	}
-	return ""
+	return false
 }
 
 func (m *Hello) GetEntry() string {
@@ -97,13 +96,6 @@ func (m *Hello) GetName() string {
 	return ""
 }
 
-func (m *Hello) GetIsinit() bool {
-	if m != nil {
-		return m.Isinit
-	}
-	return false
-}
-
 func init() {
 	proto.RegisterType((*Hello)(nil), "hello.hello")
 }
@@ -111,17 +103,16 @@ func init() {
 func init() { proto.RegisterFile("hello.proto", fileDescriptor_61ef911816e0a8ce) }
 
 var fileDescriptor_61ef911816e0a8ce = []byte{
-	// 146 bytes of a gzipped FileDescriptorProto
+	// 135 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0xce, 0x48, 0xcd, 0xc9,
-	0xc9, 0xd7, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x05, 0x73, 0x94, 0x0a, 0xb9, 0x20, 0x0c,
-	0x21, 0x21, 0x2e, 0x96, 0x8c, 0xfc, 0xe2, 0x12, 0x09, 0x46, 0x05, 0x46, 0x0d, 0xce, 0x20, 0x30,
-	0x5b, 0x48, 0x84, 0x8b, 0x35, 0x35, 0xaf, 0xa4, 0xa8, 0x52, 0x82, 0x09, 0x2c, 0x08, 0xe1, 0x80,
-	0x54, 0xe6, 0x26, 0x16, 0x67, 0x4b, 0x30, 0x2b, 0x30, 0x6a, 0xb0, 0x04, 0x81, 0xd9, 0x20, 0xb1,
-	0xbc, 0xc4, 0xdc, 0x54, 0x09, 0x16, 0x88, 0x6e, 0x10, 0x5b, 0x48, 0x8c, 0x8b, 0x2d, 0xb3, 0x38,
-	0x33, 0x2f, 0xb3, 0x44, 0x82, 0x55, 0x81, 0x51, 0x83, 0x23, 0x08, 0xca, 0x73, 0x12, 0x38, 0xf1,
-	0x48, 0x8e, 0xf1, 0xc2, 0x23, 0x39, 0xc6, 0x07, 0x8f, 0xe4, 0x18, 0x67, 0x3c, 0x96, 0x63, 0x48,
-	0x62, 0x03, 0x3b, 0xc9, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0x9a, 0x01, 0xbc, 0x85, 0xa1, 0x00,
-	0x00, 0x00,
+	0xc9, 0xd7, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x05, 0x73, 0x94, 0x62, 0xb9, 0x20, 0x0c,
+	0x21, 0x31, 0x2e, 0xb6, 0xcc, 0xe2, 0xcc, 0xbc, 0xcc, 0x12, 0x09, 0x46, 0x05, 0x46, 0x0d, 0x8e,
+	0x20, 0x28, 0x4f, 0x48, 0x84, 0x8b, 0x35, 0x35, 0xaf, 0xa4, 0xa8, 0x52, 0x82, 0x49, 0x81, 0x51,
+	0x83, 0x33, 0x08, 0xc2, 0x11, 0x12, 0xe2, 0x62, 0xc9, 0x4d, 0x2c, 0xce, 0x96, 0x60, 0x56, 0x60,
+	0xd4, 0x60, 0x09, 0x02, 0xb3, 0x41, 0x62, 0x79, 0x89, 0xb9, 0xa9, 0x12, 0x2c, 0x60, 0x85, 0x60,
+	0xb6, 0x93, 0xc0, 0x89, 0x47, 0x72, 0x8c, 0x17, 0x1e, 0xc9, 0x31, 0x3e, 0x78, 0x24, 0xc7, 0x38,
+	0xe3, 0xb1, 0x1c, 0x43, 0x12, 0x1b, 0xd8, 0x7a, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xd5,
+	0x51, 0x08, 0x96, 0x8d, 0x00, 0x00, 0x00,
 }
 
 func (m *Hello) Marshal() (dAtA []byte, err error) {
@@ -148,16 +139,6 @@ func (m *Hello) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if m.Isinit {
-		i--
-		if m.Isinit {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x28
-	}
 	if len(m.Name) > 0 {
 		i -= len(m.Name)
 		copy(dAtA[i:], m.Name)
@@ -177,12 +158,15 @@ func (m *Hello) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Host) > 0 {
-		i -= len(m.Host)
-		copy(dAtA[i:], m.Host)
-		i = encodeVarintHello(dAtA, i, uint64(len(m.Host)))
+	if m.Isinit {
 		i--
-		dAtA[i] = 0xa
+		if m.Isinit {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -204,9 +188,8 @@ func (m *Hello) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Host)
-	if l > 0 {
-		n += 1 + l + sovHello(uint64(l))
+	if m.Isinit {
+		n += 2
 	}
 	l = len(m.Entry)
 	if l > 0 {
@@ -218,9 +201,6 @@ func (m *Hello) Size() (n int) {
 	l = len(m.Name)
 	if l > 0 {
 		n += 1 + l + sovHello(uint64(l))
-	}
-	if m.Isinit {
-		n += 2
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -264,10 +244,10 @@ func (m *Hello) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Host", wireType)
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Isinit", wireType)
 			}
-			var stringLen uint64
+			var v int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowHello
@@ -277,24 +257,12 @@ func (m *Hello) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				v |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthHello
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthHello
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Host = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
+			m.Isinit = bool(v != 0)
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Entry", wireType)
@@ -378,26 +346,6 @@ func (m *Hello) Unmarshal(dAtA []byte) error {
 			}
 			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Isinit", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHello
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Isinit = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipHello(dAtA[iNdEx:])

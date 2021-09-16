@@ -1,8 +1,6 @@
 package link
 
 import (
-	"net"
-	"net/http"
 	"time"
 
 	"github.com/IPoWS/node-core/data/hello"
@@ -40,7 +38,7 @@ func listen(conn *websocket.Conn) {
 								if ip.From > 0 && ip.To > 0 && Mywsip > 0 {
 									// saveMap(ip.From, conn)
 									router.AddItem(ip.From, ip.From, uint16(delay/100000))
-									NodesList.AddNode(h.Host, h.Entry, ip.From, h.Name, uint64(delay))
+									NodesList.AddNode(conn.RemoteAddr().String(), h.Entry, ip.From, h.Name, uint64(delay))
 									registerNode(ip.From)
 								} else {
 									if Mywsip == 0 {
@@ -49,7 +47,7 @@ func listen(conn *websocket.Conn) {
 										logrus.Infof("[listen.hello] set my ip: %x with mask %x.", Mywsip, h.Mask)
 										// saveMap(Mywsip, conn)
 										router.AddItem(ip.To, ip.To, uint16(delay/100000))
-										NodesList.AddNode(h.Host, h.Entry, ip.To, h.Name, uint64(delay))
+										NodesList.AddNode(conn.RemoteAddr().String(), h.Entry, ip.To, h.Name, uint64(delay))
 										registerNode(ip.To)
 									}
 								}
@@ -77,19 +75,7 @@ func listen(conn *websocket.Conn) {
 							var newnodes nodes.Nodes
 							newnodes.Unmarshal(ip.Data)
 							for wsip, host := range newnodes.Ip64S {
-								if wsip == Mywsip {
-									logrus.Infoln("[listen.nodes] check own node ip.")
-									if myhello.Host == "" {
-										myhello.Host = host
-										listener, err := net.Listen("tcp", host)
-										if err == nil {
-											go logrus.Fatal(http.Serve(listener, nil))
-											logrus.Infof("[listen.nodes] start listening %s.", host)
-										} else {
-											logrus.Errorf("[listen.nodes] listen %s err: %v.", host, err)
-										}
-									}
-								} else {
+								if wsip != Mywsip {
 									ent := newnodes.Nodes[host]
 									alive := isLinkAlive(host, ent, wsip)
 									if alive {
