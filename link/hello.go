@@ -7,7 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// SendHello 从自身发送 hello 给对方
+// SendHello 从自身发送 hello 给对方，链接要靠 sendhello 保持交互
 func SendHello(to uint64) error {
 	h := myhello
 	return sendHello(to, &h)

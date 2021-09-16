@@ -68,10 +68,12 @@ func listen(conn *websocket.Conn) {
 									router.AddItem(ip.From, ip.From, uint16(delay/100000))
 									NodesList.AddNode(conn.RemoteAddr().String(), h.Entry, ip.From, h.Name, uint64(delay))
 									registerNode(ip.From)
+									SendHello(ip.From)
 								}
 							} else {
 								logrus.Errorln("[listen.hello] unmashal err: ", err)
 								err = nil
+								SendHello(ip.From)
 							}
 						case ip64.NodesType: // 在地址列表更新后
 							logrus.Info("[listen.nodes] recv nodes.")
@@ -93,11 +95,13 @@ func listen(conn *websocket.Conn) {
 									}
 								}
 							}
+							SendHello(ip.From)
 						case ip64.DataType:
 							destport := uint16((ip.Destproto & 0xffff_0000) >> 16)
 							srcport := uint16((uint32(ip.Srcttl) & 0xffff_0000) >> 16)
 							logrus.Infof("[listen.data] recv data from port %d to %d.", srcport, destport)
 							upper.Recv(srcport, destport, &ip.Data)
+							SendHello(ip.From)
 						}
 					} else {
 						logrus.Infof("[listen] delay of package from %x is invalid.", ip.From)
