@@ -53,7 +53,7 @@ func listen(conn *websocket.Conn) {
 										registerNode(ip.To)
 										if ip.From == 0 { // 自分配ip，是nps
 											sendmu.Lock()
-											sendmap[Mywsip] = sendmap[0]
+											sendmap[Mywsip] = conn
 											sendmu.Unlock()
 											SendHello(Mywsip) // send to me
 										}
