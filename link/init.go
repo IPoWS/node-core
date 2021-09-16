@@ -19,6 +19,10 @@ var (
 	myhello hello.Hello
 )
 
+func initLinkRet(p []byte, err error) {
+
+}
+
 func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 	t := time.Now().UnixNano()
 	h := myhello
@@ -26,8 +30,7 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 	if adviceip > 0 {
 		h.Mask = 0xffff_ffff_0000_0000
 	}
-	sendHelloUnknown(conn, &h, adviceip)
-	_, p, err := conn.ReadMessage()
+	p, err := sendHelloUnknown(conn, &h, adviceip)
 	if err != nil {
 		log.Errorf("[initlink] %v", err)
 		return adviceip, 0, err
@@ -94,7 +97,7 @@ func initEntry(ent string) {
 	http.HandleFunc("/"+ent, func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err == nil {
-			go listen(conn)
+			go handleConn(conn)
 		}
 	})
 }

@@ -42,7 +42,7 @@ func startCheck() {
 		for range t.C {
 			logrus.Info("[checklink] send hello started.")
 			for i := range NodesList.CopyIp64S() {
-				err := SendHello(i)
+				_, err := SendHello(i)
 				if err != nil {
 					DelConn(i)
 				} else {

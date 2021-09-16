@@ -8,21 +8,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Send(to uint64, data *[]byte, proto uint16, srcport uint16, destport uint16) error {
+func Send(to uint64, data *[]byte, proto uint16, srcport uint16, destport uint16) ([]byte, error) {
 	wsn, ok := readMap(to)
 	if ok {
 		var ip ip64.Ip64
 		ip.Pack(Mywsip, to, data, proto, srcport, destport)
 		logrus.Infof("[Send] link send %d bytes to %x.", len(*data), to)
-		return ip.Send(wsn, websocket.BinaryMessage)
+		return ip.Send(wsn, websocket.BinaryMessage, listen)
 	}
-	return fmt.Errorf("dest %x unreachable.", to)
+	return nil, fmt.Errorf("dest %x unreachable.", to)
 }
 
-func Forward(to uint64, ip *ip64.Ip64) error {
+func Forward(to uint64, ip *ip64.Ip64) ([]byte, error) {
 	wsn, ok := readMap(to)
 	if ok {
-		return ip.Send(wsn, websocket.BinaryMessage)
+		return ip.Send(wsn, websocket.BinaryMessage, listen)
 	}
-	return fmt.Errorf("dest %x unreachable.", to)
+	return nil, fmt.Errorf("dest %x unreachable.", to)
 }
