@@ -37,7 +37,7 @@ func NotifyChange(n *nodes.Nodes) {
 		for _, wsn := range router.AllNeighbors() {
 			if wsn != nil && wsn.Conn != nil {
 				var ip ip64.Ip64
-				ip.Pack(Mywsip, wsn.To, &data, ip64.NodesType, 0, 0)
+				ip.Pack(Mywsip, wsn.To|1, &data, ip64.NodesType, 0, 0)
 				ip.Send(wsn.Conn, websocket.BinaryMessage, nil)
 			}
 		}

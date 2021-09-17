@@ -23,7 +23,7 @@ func listen(conn *websocket.Conn) {
 		sendhellobackto := ip.From
 		if err == nil {
 			logrus.Infof("[listen] recv from: %x, to: %x.", ip.From, ip.To)
-			if Mywsip == 0 || (Mywsip != 0 && ip.To == Mywsip) {
+			if Mywsip == 0 || (Mywsip != 0 && ip.To&myhello.Mask == Mywsip&myhello.Mask) {
 				t := time.Now().UnixNano()
 				delay := t - ip.Time
 				logrus.Infof("[listen] delay: %d ns.", delay)
