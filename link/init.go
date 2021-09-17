@@ -16,7 +16,6 @@ var (
 	npsurl  string
 	Mywsip  uint64
 	myhello hello.Hello
-	myhost  string
 )
 
 func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
@@ -101,9 +100,9 @@ func UpgradeLink(w http.ResponseWriter, r *http.Request, adviceip uint64) (uint6
 }
 
 func ListenAccess() error {
-	listener, err := net.Listen("tcp", myhost)
+	listener, err := net.Listen("tcp", myhello.Myhost)
 	if err == nil {
-		log.Infoln("[link] listen access on", myhost)
+		log.Infoln("[link] listen access on", myhello.Myhost)
 		go log.Fatal(http.Serve(listener, nil))
 	}
 	return err

@@ -46,7 +46,7 @@ func listen(conn *websocket.Conn) {
 								if ip.From != 0 { // 是其它node建立的链接，建立一条反向链接以send
 									ok := router.IsIn(ip.From)
 									if !ok {
-										InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
+										InitLink("ws://"+h.Myhost+"/"+h.Entry, ip.From)
 									}
 								}
 							}

@@ -60,7 +60,7 @@ func startDeliverNewNodes() {
 			n := router.NearMe()
 			if len(n) > 0 {
 				for _, i := range n {
-					registerNode(myhost, myhello.Entry, i.To|1, NodesList.Names[i.To|1], uint64(i.Delay100us)*100000)
+					registerNode(myhello.Myhost, myhello.Entry, i.To|1, NodesList.Names[i.To|1], uint64(i.Delay100us)*100000)
 				}
 				SendNewNodes(newnodes)
 			}
