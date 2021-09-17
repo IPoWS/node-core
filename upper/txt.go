@@ -8,7 +8,7 @@ type txtservice struct {
 }
 
 func (s *txtservice) Handle(srcport uint16, destport uint16, data *[]byte) {
-	logrus.Infof("[upper.txt] recv %s.", data)
+	logrus.Infof("[upper.txt] recv %s.", *data)
 }
 
 func init() {
