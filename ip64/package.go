@@ -13,5 +13,5 @@ func (ip *Ip64) Pack(from uint64, to uint64, data *[]byte, proto uint16, srcport
 	ip.Data = *data
 	ip.Srcttl = (int32(srcport) << 16) | 8
 	ip.Time = time.Now().UnixNano()
-	logrus.Infof("[ip64] pack data: %d bytes.", len(ip.Data))
+	logrus.Debugf("[ip64] pack data: %d bytes.", len(ip.Data))
 }

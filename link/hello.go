@@ -34,7 +34,7 @@ func sendHelloUnknown(conn *websocket.Conn, h *hello.Hello, adviceip uint64) ([]
 	if err == nil {
 		var ip ip64.Ip64
 		ip.Pack(Mywsip, adviceip, &data, ip64.HelloType, 0, 0)
-		logrus.Info("[link.hello] send hello unknown.")
+		logrus.Info("[link.hello] send hello to unknown.")
 		data, err = ip.Send(conn, websocket.BinaryMessage, nil)
 	}
 	if err != nil {

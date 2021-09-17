@@ -35,7 +35,7 @@ func (m *Nodes) Load(nodesfile string) error {
 	m.FileMu.RLock()
 	data, err := os.ReadFile(nodesfile)
 	m.FileMu.RUnlock()
-	logrus.Infof("[nodes] load %d bytes from file.", len(data))
+	logrus.Debugf("[nodes] load %d bytes from file.", len(data))
 	if err == nil && data != nil && len(data) > 0 {
 		m.MemMu.Lock()
 		err = m.Unmarshal(data)
@@ -52,7 +52,7 @@ func (m *Nodes) Clear() {
 	m.Nodes = make(map[string]string)
 	m.Delay = make(map[uint64]uint64)
 	m.Names = make(map[uint64]string)
-	logrus.Infoln("[nodes] clear node.")
+	logrus.Debugln("[nodes] clear node.")
 }
 
 func (m *Nodes) CopyNodes() map[string]string {
@@ -96,7 +96,7 @@ func (m *Nodes) CopyDelay() map[uint64]uint64 {
 }
 
 func (m *Nodes) AddNode(host string, ent string, ip uint64, name string, delay uint64) {
-	logrus.Debugln("[nodes] add node ", host, ent, ip, name, delay)
+	logrus.Debugln("[nodes] add node", host, ent, ip, name, delay)
 	m.MemMu.Lock()
 	m.Nodes[host] = ent
 	m.Ip64S[ip] = host

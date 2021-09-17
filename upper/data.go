@@ -28,10 +28,12 @@ func Recv(srcport uint16, destport uint16, data *[]byte) {
 }
 
 func Register(port uint16, service *Service) bool {
+	logrus.Debugln("[upper] reg start.")
 	mu.RLock()
 	_, ok := handlers[port]
 	mu.RUnlock()
 	ina := !ok
+	logrus.Debugln("[upper] reg read ina:", ina)
 	if ina {
 		mu.Lock()
 		handlers[port] = service
