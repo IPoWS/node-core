@@ -5,7 +5,7 @@ import (
 )
 
 func isLinkAlive(host string, ent string, ip uint64) bool {
-	wsip, _, err := InitLink("ws://"+host+"/"+ent, ip)
+	wsip, _, err := InitLink("ws://"+host+"/"+ent, ip, true)
 	if err != nil || (ip != 0 && wsip != ip) {
 		return false
 	}

@@ -18,10 +18,10 @@ var (
 	myhello hello.Hello
 )
 
-func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
+func initLink(conn *websocket.Conn, adviceip uint64, isfirst bool) (uint64, int64, error) {
 	t := time.Now().UnixNano()
 	h := myhello
-	h.Isinit = true
+	h.Isinit = isfirst
 	if adviceip > 0 {
 		h.Mask = 0xffff_ffff_0000_0000
 	}
@@ -56,14 +56,14 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 }
 
 // InitLink 初始化连接 返回 wsip delay error, url 必须以 ws:// 开头, 以 ent 结尾, adviceip 可为 0
-func InitLink(url string, adviceip uint64) (uint64, int64, error) {
+func InitLink(url string, adviceip uint64, isfirst bool) (uint64, int64, error) {
 	log.Printf("[initlink] connecting to %s, adv ip %x", url, adviceip)
 	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		log.Errorf("[initlink] %v", err)
 		return 0, 0, err
 	}
-	return initLink(conn, adviceip)
+	return initLink(conn, adviceip, isfirst)
 }
 
 var upgrader = websocket.Upgrader{}
@@ -94,7 +94,7 @@ func UpgradeLink(w http.ResponseWriter, r *http.Request, adviceip uint64) (uint6
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err == nil {
 		log.Infof("[link.init] upgrade link for %x.", adviceip)
-		return initLink(conn, adviceip)
+		return initLink(conn, adviceip, true)
 	}
 	return 0, 0, err
 }
