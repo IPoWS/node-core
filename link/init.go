@@ -103,7 +103,9 @@ func ListenAccess() error {
 	listener, err := net.Listen("tcp", myhello.Myhost)
 	if err == nil {
 		log.Infoln("[link] listen access on", myhello.Myhost)
-		go log.Fatal(http.Serve(listener, nil))
+		go func() {
+			log.Fatal(http.Serve(listener, nil))
+		}()
 	}
 	return err
 }
