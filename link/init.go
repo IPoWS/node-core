@@ -7,7 +7,6 @@ import (
 
 	"github.com/IPoWS/node-core/data/hello"
 	"github.com/IPoWS/node-core/ip64"
-	"github.com/IPoWS/node-core/router"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
@@ -56,10 +55,7 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 		return ip.From, delay, fmt.Errorf("peer %x reported a diff wsip than adv %x.", ip.From, adviceip)
 	}
 	if ip.From > 0 {
-		saveMap(ip.From, conn)
-		router.AddItem(ip.From, ip.From, uint16(delay/100000))
-		NodesList.AddNode(conn.RemoteAddr().String(), h.Entry, ip.From, h.Name, uint64(delay))
-		registerNode(ip.From)
+		AddDirectConn(ip.From, conn.RemoteAddr().String(), h.Entry, h.Name, uint64(delay), h.Mask, conn)
 		log.Printf("[initlink] 链接测试成功，延时%vns，对方ip: %x", delay, ip.From)
 		return ip.From, delay, nil
 	}

@@ -2,32 +2,35 @@ package router
 
 import (
 	"sync"
+
+	"github.com/gorilla/websocket"
 )
 
-type transItem struct {
-	to         uint64
-	next       uint64
-	delay100us uint16
+type TransItem struct {
+	To         uint64
+	Next       uint64
+	Delay100us uint16
+	Conn       *websocket.Conn
 }
 
-type TransTable struct {
+type transTable struct {
 	// to -> ti
-	table map[uint64]*transItem
+	table map[uint64]*TransItem
 	// delay / 100us -> ti
-	delays [65536]*transItem
+	delays [65536]*TransItem
 	mu     sync.RWMutex
 }
 
-func (t *TransTable) init() {
-	t.table = make(map[uint64]*transItem)
+func (t *transTable) init() {
+	t.table = make(map[uint64]*TransItem)
 }
 
-func (t *TransTable) add(item *transItem) {
+func (t *transTable) add(item *TransItem) {
 	t.mu.RLock()
-	i, ok := t.table[item.to]
-	if ok {
-		if i.next != item.next {
-			if item.delay100us >= i.delay100us {
+	i, ok := t.table[item.To]
+	if ok && i != nil && i.Conn != nil {
+		if i.Next != item.Next {
+			if item.Delay100us >= i.Delay100us {
 				t.mu.RUnlock()
 				return
 			}
@@ -37,22 +40,22 @@ func (t *TransTable) add(item *transItem) {
 	}
 	t.mu.RUnlock()
 	t.mu.Lock()
-	t.delays[item.delay100us] = item
-	t.table[item.to] = item
+	t.delays[item.Delay100us] = item
+	t.table[item.To] = item
 	t.mu.Unlock()
 }
 
-func (t *TransTable) del(to uint64) {
+func (t *transTable) del(to uint64) {
 	t.mu.Lock()
 	i, ok := t.table[to]
 	if ok {
 		delete(t.table, to)
-		t.delays[i.delay100us] = nil
+		t.delays[i.Delay100us] = nil
 	}
 	t.mu.Unlock()
 }
 
-func (t *TransTable) nextHop(to uint64) *transItem {
+func (t *transTable) nextHop(to uint64) *TransItem {
 	defer t.mu.RUnlock()
 	t.mu.RLock()
 	// 最长掩码匹配
@@ -67,12 +70,30 @@ func (t *TransTable) nextHop(to uint64) *transItem {
 	return nil
 }
 
-func (t *TransTable) near() (r []uint64) {
+func (t *transTable) near() (r []*TransItem) {
 	for i := 0; i < 8192; i++ {
 		i := t.delays[i]
 		if i != nil {
-			r = append(r, i.to)
+			r = append(r, i)
 		}
 	}
 	return
+}
+
+func (t *transTable) all() (r []*TransItem) {
+	t.mu.RLock()
+	for _, item := range t.table {
+		if item != nil {
+			r = append(r, item)
+		}
+	}
+	t.mu.RUnlock()
+	return
+}
+
+func (t *transTable) isIn(ip uint64) bool {
+	t.mu.RLock()
+	i, ok := t.table[ip]
+	t.mu.RUnlock()
+	return ok && i.Conn != nil
 }

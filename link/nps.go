@@ -5,6 +5,7 @@ import (
 
 	"github.com/IPoWS/node-core/data/nodes"
 	"github.com/IPoWS/node-core/ip64"
+	"github.com/IPoWS/node-core/router"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
@@ -32,11 +33,11 @@ func Register() error {
 func NotifyChange(n *nodes.Nodes) {
 	data, err := n.Marshal()
 	if err == nil {
-		for to, wsn := range copyMap() {
-			if to > 0 && wsn != nil {
+		for _, wsn := range router.AllNeighbors() {
+			if wsn != nil && wsn.Conn != nil {
 				var ip ip64.Ip64
-				ip.Pack(Mywsip, to, &data, ip64.NodesType, 0, 0)
-				ip.Send(wsn, websocket.BinaryMessage, nil)
+				ip.Pack(Mywsip, wsn.To, &data, ip64.NodesType, 0, 0)
+				ip.Send(wsn.Conn, websocket.BinaryMessage, nil)
 			}
 		}
 	}

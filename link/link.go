@@ -4,17 +4,18 @@ import (
 	"fmt"
 
 	"github.com/IPoWS/node-core/ip64"
+	"github.com/IPoWS/node-core/router"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
 
 func Send(to uint64, data *[]byte, proto uint16, srcport uint16, destport uint16) ([]byte, error) {
-	wsn, ok := readMap(to)
-	if ok {
+	wsn := router.NextHop(to)
+	if wsn != nil && wsn.Conn != nil {
 		var ip ip64.Ip64
 		ip.Pack(Mywsip, to, data, proto, srcport, destport)
 		logrus.Infof("[Send] link send %d bytes to %x.", len(*data), to)
-		d, err := ip.Send(wsn, websocket.BinaryMessage, nil)
+		d, err := ip.Send(wsn.Conn, websocket.BinaryMessage, nil)
 		if err != nil {
 			DelConn(to)
 		}
@@ -24,9 +25,9 @@ func Send(to uint64, data *[]byte, proto uint16, srcport uint16, destport uint16
 }
 
 func Forward(to uint64, ip *ip64.Ip64) ([]byte, error) {
-	wsn, ok := readMap(to)
-	if ok {
-		d, err := ip.Send(wsn, websocket.BinaryMessage, nil)
+	wsn := router.NextHop(to)
+	if wsn != nil && wsn.Conn != nil {
+		d, err := ip.Send(wsn.Conn, websocket.BinaryMessage, nil)
 		if err != nil {
 			DelConn(to)
 		}

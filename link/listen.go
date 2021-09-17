@@ -26,12 +26,12 @@ func listen(conn *websocket.Conn) {
 			if Mywsip == 0 || (Mywsip != 0 && ip.To == Mywsip) {
 				t := time.Now().UnixNano()
 				delay := t - ip.Time
+				logrus.Infof("[listen] delay: %d ns.", delay)
 				if delay < int64(time.Second*6) && delay > 0 {
 					switch uint16(ip.Destproto & 0x0000_ffff) {
 					case ip64.HelloType:
 						var h hello.Hello
 						err = h.Unmarshal(ip.Data)
-						logrus.Infof("[listen.hello] delay: %d ns.", delay)
 						if err == nil {
 							if h.Isinit {
 								logrus.Infoln("[listen.hello] recv init.")
@@ -39,31 +39,17 @@ func listen(conn *websocket.Conn) {
 									Mywsip = ip.To
 									myhello.Mask = h.Mask
 									logrus.Infof("[listen.hello] set my ip: %x with mask %x.", Mywsip, h.Mask)
-									// saveMap(Mywsip, conn)
-									router.AddItem(ip.To, ip.To, uint16(delay/100000))
-									NodesList.AddNode(conn.RemoteAddr().String(), h.Entry, ip.To, h.Name, uint64(delay))
-									registerNode(ip.To)
 									if ip.From == 0 { // 自分配ip，是nps
-										sendmu.Lock()
-										sendmap[Mywsip] = conn
-										sendmu.Unlock()
+										AddDirectConn(ip.To, conn.RemoteAddr().String(), h.Entry, h.Name, uint64(delay), h.Mask, conn)
 										sendhellobackto = Mywsip
 									}
 								}
 								if ip.From != 0 { // 是其它node建立的链接，建立一条反向链接以send
-									sendmu.Lock()
-									_, ok := sendmap[ip.From]
-									sendmap[ip.From] = conn
-									sendmu.Unlock()
+									ok := router.IsIn(ip.From)
 									if !ok {
 										InitLink("ws://"+conn.RemoteAddr().String()+"/"+h.Entry, ip.From)
 									}
 								}
-							} else if ip.From > 0 && ip.To > 0 && Mywsip > 0 {
-								// saveMap(ip.From, conn)
-								router.AddItem(ip.From, ip.From, uint16(delay/100000))
-								NodesList.AddNode(conn.RemoteAddr().String(), h.Entry, ip.From, h.Name, uint64(delay))
-								registerNode(ip.From)
 							}
 						} else {
 							logrus.Errorln("[listen.hello] unmashal err: ", err)
@@ -83,9 +69,12 @@ func listen(conn *websocket.Conn) {
 								}
 								relay := int64(newnodes.Delay[wsip]) + delay
 								if (alive && relay < int64(NodesList.Delay[wsip])) || (!alive && relay < int64(time.Second)) {
-									NodesList.AddNode(host, ent, wsip, newnodes.Names[wsip], uint64(relay))
-									router.AddItem(wsip, ip.From, uint16(relay/100000))
-									logrus.Infof("[listen.nodes] add node %x through %x, delay %d ms.", wsip, ip.From, relay/10)
+									tab := router.NextHop(wsip)
+									if tab != nil && tab.Conn != nil {
+										NodesList.AddNode(host, ent, wsip, newnodes.Names[wsip], uint64(relay))
+										router.AddItem(wsip, ip.From, uint16(relay/100000), tab.Conn)
+										logrus.Infof("[listen.nodes] add node %x through %x, delay %d ms.", wsip, ip.From, relay/10)
+									}
 								}
 							}
 						}
@@ -100,7 +89,7 @@ func listen(conn *websocket.Conn) {
 				}
 			} else {
 				logrus.Infof("[listen] forward pack from %x to %x.", ip.From, ip.To)
-				Forward(router.NextHop(ip.To), &ip)
+				Forward(router.NextHop(ip.To).To, &ip)
 			}
 			SendHello(sendhellobackto, conn)
 		}
