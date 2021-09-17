@@ -13,7 +13,7 @@ var (
 	NodesList *nodes.Nodes
 	nfile     string
 	newnodes  *nodes.Nodes
-	nnt       = time.NewTicker(time.Second)
+	nnt       = time.NewTicker(time.Second * 16)
 )
 
 func init() {

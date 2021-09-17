@@ -8,7 +8,7 @@ import (
 
 func DelConn(wsip uint64) {
 	logrus.Infof("[delconn] %x is unreachable and del it from table.", wsip)
-	router.DelItem(wsip)
+	router.DelItem(wsip & myhello.Mask)
 	NodesList.DelNodeByIP(wsip)
 	SaveNodesBack()
 }

@@ -44,7 +44,7 @@ func listen(conn *websocket.Conn) {
 									}
 								}
 								if ip.From != 0 { // 是其它node建立的链接，建立一条反向链接以send
-									ok := router.IsIn(ip.From)
+									ok := router.IsIn(ip.From & h.Mask)
 									if !ok {
 										InitLink("ws://"+h.Myhost+"/"+h.Entry, ip.From, false)
 									}
@@ -71,7 +71,7 @@ func listen(conn *websocket.Conn) {
 									tab := router.NextHop(wsip)
 									if tab != nil && tab.Conn != nil {
 										NodesList.AddNode(host, ent, wsip, newnodes.Names[wsip], uint64(relay))
-										router.AddItem(wsip, ip.From, uint16(relay/100000), tab.Conn)
+										router.AddItem(wsip&myhello.Mask, ip.From, uint16(relay/100000), tab.Conn)
 										logrus.Infof("[listen.nodes] add node %x through %x, delay %d ms.", wsip, ip.From, relay/10)
 									}
 								}
