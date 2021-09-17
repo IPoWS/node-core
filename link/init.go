@@ -26,7 +26,6 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 	t := time.Now().UnixNano()
 	h := myhello
 	h.Isinit = true
-	isNps := Mywsip == 0
 	if adviceip > 0 {
 		h.Mask = 0xffff_ffff_0000_0000
 	}
@@ -55,9 +54,7 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 		log.Infof("[initlink] peer %x reported a diff wsip than adv %x.", ip.From, adviceip)
 		return ip.From, delay, fmt.Errorf("peer %x reported a diff wsip than adv %x.", ip.From, adviceip)
 	}
-	if !isNps {
-		AddDirectConn(ip.From, conn.RemoteAddr().String(), h.Entry, h.Name, uint64(delay), h.Mask, conn)
-	}
+	AddDirectConn(ip.From, conn.RemoteAddr().String(), h.Entry, h.Name, uint64(delay), h.Mask, conn)
 	log.Printf("[initlink] 链接测试成功，延时%vns，对方ip: %x", delay, ip.From)
 	return ip.From, delay, nil
 }

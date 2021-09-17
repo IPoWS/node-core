@@ -40,7 +40,6 @@ func listen(conn *websocket.Conn) {
 									myhello.Mask = h.Mask
 									logrus.Infof("[listen.hello] set my ip: %x with mask %x.", Mywsip, h.Mask)
 									if ip.From == 0 { // 自分配ip，是nps
-										AddDirectConn(ip.To, conn.RemoteAddr().String(), h.Entry, h.Name, uint64(delay), h.Mask, conn)
 										sendhellobackto = Mywsip
 									}
 								}
