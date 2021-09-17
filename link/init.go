@@ -2,13 +2,13 @@ package link
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 
 	"github.com/IPoWS/node-core/data/hello"
 	"github.com/IPoWS/node-core/ip64"
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -16,11 +16,8 @@ var (
 	npsurl  string
 	Mywsip  uint64
 	myhello hello.Hello
+	myhost  string
 )
-
-func initLinkRet(p []byte, err error) {
-
-}
 
 func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 	t := time.Now().UnixNano()
@@ -52,7 +49,7 @@ func initLink(conn *websocket.Conn, adviceip uint64) (uint64, int64, error) {
 	}
 	if adviceip > 0 && ip.From&h.Mask != adviceip&h.Mask {
 		log.Infof("[initlink] peer %x reported a diff wsip than adv %x.", ip.From, adviceip)
-		return ip.From, delay, fmt.Errorf("peer %x reported a diff wsip than adv %x.", ip.From, adviceip)
+		return ip.From, delay, fmt.Errorf("peer %x reported a diff wsip than adv %x", ip.From, adviceip)
 	}
 	AddDirectConn(ip.From, conn.RemoteAddr().String(), h.Entry, h.Name, uint64(delay), h.Mask, conn)
 	log.Printf("[initlink] 链接测试成功，延时%vns，对方ip: %x", delay, ip.From)
@@ -80,7 +77,7 @@ func InitEntry(nps string, ent string, hostname string, mask uint64) {
 		Name:  hostname,
 		Mask:  mask,
 	}
-	logrus.Infof("[InitEntry] nps: %s, ent: %s, name: %s, mask: %x.", nps, ent, hostname, mask)
+	log.Infof("[InitEntry] nps: %s, ent: %s, name: %s, mask: %x.", nps, ent, hostname, mask)
 	initEntry(ent)
 }
 
@@ -97,8 +94,16 @@ func initEntry(ent string) {
 func UpgradeLink(w http.ResponseWriter, r *http.Request, adviceip uint64) (uint64, int64, error) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err == nil {
-		logrus.Infof("[link.init] upgrade link for %x.", adviceip)
+		log.Infof("[link.init] upgrade link for %x.", adviceip)
 		return initLink(conn, adviceip)
 	}
 	return 0, 0, err
+}
+
+func ListenAccess() error {
+	listener, err := net.Listen("tcp", myhost)
+	if err == nil {
+		go log.Fatal(http.Serve(listener, nil))
+	}
+	return err
 }

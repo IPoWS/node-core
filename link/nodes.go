@@ -49,19 +49,18 @@ func SendNewNodes(newnodes *nodes.Nodes) {
 }
 
 // registerNode 注册新的节点到newnodes以便广播
-func registerNode(ip uint64, delay uint64) {
-	host := NodesList.Ip64S[ip]
-	newnodes.AddNode(host, NodesList.Nodes[host], ip, NodesList.Names[ip], delay)
-	logrus.Infof("[registerNode] %x.", ip)
+func registerNode(host string, ent string, to uint64, name string, delay uint64) {
+	newnodes.AddNode(host, ent, to, name, delay)
+	logrus.Infof("[registerNode] %x.", to)
 }
 
 func startDeliverNewNodes() {
 	go func() {
 		for range nnt.C {
 			n := router.NearMe()
-			if n != nil && len(n) > 0 {
+			if len(n) > 0 {
 				for _, i := range n {
-					registerNode(i.To, uint64(i.Delay100us)*100000)
+					registerNode(myhost, myhello.Entry, i.To, NodesList.Names[i.To], uint64(i.Delay100us)*100000)
 				}
 				SendNewNodes(newnodes)
 			}

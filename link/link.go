@@ -21,7 +21,7 @@ func Send(to uint64, data *[]byte, proto uint16, srcport uint16, destport uint16
 		}
 		return d, err
 	}
-	return nil, fmt.Errorf("dest %x unreachable.", to)
+	return nil, fmt.Errorf("dest %x unreachable", to)
 }
 
 func Forward(to uint64, ip *ip64.Ip64) ([]byte, error) {
@@ -33,5 +33,5 @@ func Forward(to uint64, ip *ip64.Ip64) ([]byte, error) {
 		}
 		return d, err
 	}
-	return nil, fmt.Errorf("dest %x unreachable.", to)
+	return nil, fmt.Errorf("dest %x unreachable", to)
 }

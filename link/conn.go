@@ -16,5 +16,5 @@ func DelConn(wsip uint64) {
 func AddDirectConn(to uint64, host string, ent string, name string, delay uint64, mask uint64, conn *websocket.Conn) {
 	router.AddItem(to&mask, to&mask, uint16(delay/100000), conn)
 	NodesList.AddNode(host, ent, to, name, delay)
-	registerNode(to, delay)
+	registerNode(host, ent, to, name, delay)
 }
