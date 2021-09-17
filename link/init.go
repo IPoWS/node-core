@@ -103,7 +103,7 @@ func UpgradeLink(w http.ResponseWriter, r *http.Request, adviceip uint64) (uint6
 func ListenAccess() error {
 	listener, err := net.Listen("tcp", myhost)
 	if err == nil {
-		log.Infof("[link] listen access on", myhost)
+		log.Infoln("[link] listen access on", myhost)
 		go log.Fatal(http.Serve(listener, nil))
 	}
 	return err
