@@ -58,9 +58,12 @@ func startDeliverNewNodes() {
 	go func() {
 		for range nnt.C {
 			n := router.NearMe()
-			if len(n) > 0 {
+			NodesList.MemMu.RLock()
+			myhost := NodesList.Ip64S[Mywsip]
+			NodesList.MemMu.RUnlock()
+			if myhost != "" && len(n) > 0 {
 				for _, i := range n {
-					registerNode(myhello.Myhost, myhello.Entry, i.To|1, NodesList.Names[i.To|1], uint64(i.Delay100us)*100000)
+					registerNode(myhost, myhello.Entry, i.To|1, NodesList.Names[i.To|1], uint64(i.Delay100us)*100000)
 				}
 				SendNewNodes(newnodes)
 			}

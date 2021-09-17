@@ -9,5 +9,4 @@ message hello {
     uint64 mask = 3;
     // host name
     string name = 4;
-    string myhost = 5;
 }

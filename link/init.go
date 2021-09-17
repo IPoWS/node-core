@@ -99,10 +99,11 @@ func UpgradeLink(w http.ResponseWriter, r *http.Request, adviceip uint64) (uint6
 	return 0, 0, err
 }
 
-func ListenAccess() error {
-	listener, err := net.Listen("tcp", myhello.Myhost)
+func ListenAccess(port uint16) error {
+	addr := fmt.Sprintf("0.0.0.0:%d", port)
+	listener, err := net.Listen("tcp", addr)
 	if err == nil {
-		log.Infoln("[link] listen access on", myhello.Myhost)
+		log.Infoln("[link] listen access on", addr)
 		go func() {
 			log.Fatal(http.Serve(listener, nil))
 		}()
