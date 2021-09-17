@@ -59,6 +59,7 @@ func listen(conn *websocket.Conn) {
 						var newnodes nodes.Nodes
 						newnodes.Unmarshal(ip.Data)
 						for wsip, host := range newnodes.Ip64S {
+							logrus.Debugf("[listen.nodes] analyze ip: %x, host: %s.", wsip, host)
 							if host != "" && wsip&myhello.Mask != Mywsip&myhello.Mask {
 								ent := newnodes.Nodes[host]
 								alive := isLinkAlive(host, ent, wsip)

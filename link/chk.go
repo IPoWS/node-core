@@ -7,8 +7,10 @@ import (
 func isLinkAlive(host string, ent string, ip uint64) bool {
 	wsip, _, err := InitLink("ws://"+host+"/"+ent, ip, true)
 	if err != nil || (ip != 0 && wsip != ip) {
+		logrus.Debugf("[link.chk] link to host %s with ip %x (advice %x) err: %v.", host, wsip, ip)
 		return false
 	}
+	logrus.Debugf("[link.chk] link to host %s with ip %x (advice %x) alive.")
 	return true
 }
 
