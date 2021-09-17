@@ -10,6 +10,7 @@ import (
 	"github.com/IPoWS/node-core/upper"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // listen 监听其他节点发来的包
@@ -27,7 +28,11 @@ func listen(conn *websocket.Conn) {
 				t := time.Now().UnixNano()
 				delay := t - ip.Time
 				logrus.Infof("[listen] delay: %d ns.", delay)
-				if delay < int64(time.Second*6) && delay > 0 {
+				if delay < int64(time.Second*6) && delay > -time.Hour.Milliseconds()*50 {
+					if delay < 0 {
+						log.Infoln("[listen] fix delay to positive.")
+						delay = 100000000
+					}
 					switch uint16(ip.Destproto & 0x0000_ffff) {
 					case ip64.HelloType:
 						var h hello.Hello

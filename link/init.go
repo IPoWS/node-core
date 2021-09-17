@@ -43,8 +43,13 @@ func initLink(conn *websocket.Conn, adviceip uint64, isfirst bool) (uint64, int6
 	}
 	delay := ip.Time - t
 	if delay <= 0 {
-		log.Errorf("[initlink] tr: %v, t: %v", ip.Time, t)
-		return ip.From, delay, err
+		if delay > -time.Hour.Milliseconds()*50 {
+			log.Infof("[initlink] fix delay %d to positive.", delay)
+			delay = 100000000
+		} else {
+			log.Errorf("[initlink] tr: %v ns, t: %v ns, delay %d is minus.", ip.Time, t, delay)
+			return ip.From, delay, err
+		}
 	}
 	if adviceip > 0 && ip.From&h.Mask != adviceip&h.Mask {
 		log.Infof("[initlink] peer %x reported a diff wsip than adv %x.", ip.From, adviceip)
