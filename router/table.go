@@ -36,5 +36,13 @@ func AllNeighbors() []*TransItem {
 }
 
 func IsIn(ip uint64) bool {
-	return table.isIn(ip)
+	// 最长掩码匹配
+	var i uint64 = 0xffff_ffff_ffff_ffff
+	for i != 0 {
+		if table.isIn(ip & i) {
+			return true
+		}
+		i <<= 1
+	}
+	return false
 }
